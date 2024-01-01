@@ -105,7 +105,7 @@ export function* segment(
 ): Generator<string, void, void> {
   _assertStringType(input, "input");
 
-  if (SafeInteger.isPositive(charCount) !== true) {
+  if (SafeInteger.isPositiveSafeInteger(charCount) !== true) {
     throw new TypeError("charCount");
   }
   if ((isString(paddingChar) !== true) && (paddingChar !== undefined)) {
