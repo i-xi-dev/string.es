@@ -6,7 +6,7 @@ function _isIsomorphicEncoded(value: string): boolean {
 /**
  * Isomorphic encoding
  */
-namespace Isomorphic {
+export namespace Isomorphic {
   /**
    * Implements [isomorphic decode](https://infra.spec.whatwg.org/#isomorphic-decode) defined in WHATWG Infra Standard.
    *
@@ -55,5 +55,3 @@ namespace Isomorphic {
     return bytes;
   }
 }
-
-export { Isomorphic };
