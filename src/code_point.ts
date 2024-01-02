@@ -12,4 +12,11 @@ export namespace CodePoint {
     return Number.isSafeInteger(test) &&
       NumberEx.inRange(test as number, [MIN_VALUE, MAX_VALUE]);
   }
+
+  export function toString(source: CodePoint): string {
+    if (isCodePoint(CodePoint)) {
+      return `U+${source.toString(16).toUpperCase().padStart(4, "0")}`;
+    }
+    throw new RangeError("source");
+  }
 }
