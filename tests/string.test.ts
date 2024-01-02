@@ -262,7 +262,6 @@ Deno.test("segment(string, number)", () => {
       [...segment(1 as unknown as string, 0)];
     },
     TypeError,
-    undefined,
     "input",
   );
 
@@ -271,7 +270,6 @@ Deno.test("segment(string, number)", () => {
       [...segment("", 0)];
     },
     TypeError,
-    undefined,
     "charCount",
   );
 
@@ -293,7 +291,6 @@ Deno.test("segment(string, number, string)", () => {
       [...segment("", 1, "")];
     },
     TypeError,
-    undefined,
     "paddingChar",
   );
 
@@ -302,7 +299,6 @@ Deno.test("segment(string, number, string)", () => {
       [...segment("", 1, "XX")];
     },
     TypeError,
-    undefined,
     "paddingChar",
   );
 });

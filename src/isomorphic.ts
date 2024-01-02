@@ -20,7 +20,7 @@ export namespace Isomorphic {
     } else if (input instanceof ArrayBuffer) {
       bytes = new Uint8Array(input);
     } else {
-      throw new TypeError("buffer");
+      throw new TypeError("input");
     }
 
     // A: Bの2倍以上遅い（Node.js）

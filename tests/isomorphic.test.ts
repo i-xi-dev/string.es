@@ -35,8 +35,7 @@ Deno.test("Isomorphic.decode", () => {
       Isomorphic.decode([] as unknown as Uint8Array);
     },
     TypeError,
-    undefined,
-    "buffer",
+    "input",
   );
 });
 
@@ -67,7 +66,6 @@ Deno.test("Isomorphic.encode", () => {
       Isomorphic.encode("\u0100");
     },
     TypeError,
-    undefined,
     "input",
   );
 });
