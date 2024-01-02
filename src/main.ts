@@ -1,4 +1,4 @@
-import { SafeInteger } from "../deps.ts";
+import { NumberEx } from "../deps.ts";
 
 export function isString(test: unknown): test is string {
   return (typeof test === "string");
@@ -100,12 +100,12 @@ export function trimEnd(input: string, pattern: string): string {
 
 export function* segment(
   input: string,
-  charCount: SafeInteger,
+  charCount: NumberEx.SafeInteger,
   paddingChar?: string,
 ): Generator<string, void, void> {
   _assertStringType(input, "input");
 
-  if (SafeInteger.isPositiveSafeInteger(charCount) !== true) {
+  if (NumberEx.SafeInteger.isPositiveSafeInteger(charCount) !== true) {
     throw new TypeError("charCount");
   }
   if ((isString(paddingChar) !== true) && (paddingChar !== undefined)) {

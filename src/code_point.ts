@@ -1,4 +1,4 @@
-import { inRange } from "../deps.ts";
+import { NumberEx } from "../deps.ts";
 
 // 事実上定義できないのでnumberの別名とする
 export type CodePoint = number;
@@ -10,6 +10,6 @@ export namespace CodePoint {
 
   export function isCodePoint(test: unknown): test is CodePoint {
     return Number.isSafeInteger(test) &&
-      inRange(test as number, [MIN_VALUE, MAX_VALUE]);
+      NumberEx.inRange(test as number, [MIN_VALUE, MAX_VALUE]);
   }
 }
