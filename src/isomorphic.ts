@@ -1,4 +1,9 @@
+import { isString } from "./main.ts";
+
 function _isIsomorphicEncoded(value: string): boolean {
+  if (isString(value) !== true) {
+    return false;
+  }
   // deno-lint-ignore no-control-regex
   return /^[\u{0}-\u{FF}]*$/u.test(value);
 }

@@ -104,4 +104,13 @@ Deno.test("Utf8.encode", () => {
     JSON.stringify([...Utf8.encode("\uFEFFあいう")]),
     "[239,187,191,227,129,130,227,129,132,227,129,134]",
   );
+
+  // encode(any)
+  assertThrows(
+    () => {
+      Utf8.encode(0 as unknown as string);
+    },
+    TypeError,
+    "input",
+  );
 });

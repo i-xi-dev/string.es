@@ -68,4 +68,13 @@ Deno.test("Isomorphic.encode", () => {
     TypeError,
     "input",
   );
+
+  // encode(any)
+  assertThrows(
+    () => {
+      Isomorphic.encode(0 as unknown as string);
+    },
+    TypeError,
+    "input",
+  );
 });
