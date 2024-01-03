@@ -1,5 +1,5 @@
 import { assertStrictEquals, assertThrows } from "./deps.ts";
-import { Utf16be, Utf8 } from "../mod.ts";
+import { Utf16be } from "../mod.ts";
 
 Deno.test("Utf16be.decode(BufferSource)", () => {
   // decode()
@@ -38,6 +38,25 @@ Deno.test("Utf16be.decode(BufferSource)", () => {
       ),
     ),
     "あいう",
+  );
+  assertStrictEquals(
+    Utf16be.decode(
+      Uint8Array.of(
+        0xFE,
+        0xFF,
+        0x30,
+        0x42,
+        0x30,
+        0x44,
+        0xD8,
+        0x40,
+        0xDC,
+        0x0B,
+        0x30,
+        0x46,
+      ),
+    ),
+    "あい\u{2000B}う",
   );
   assertStrictEquals(
     Utf16be.decode(
@@ -121,6 +140,26 @@ Deno.test("Utf16be.decode(BufferSource, {})", () => {
   assertStrictEquals(
     Utf16be.decode(
       Uint8Array.of(
+        0xFE,
+        0xFF,
+        0x30,
+        0x42,
+        0x30,
+        0x44,
+        0xD8,
+        0x40,
+        0xDC,
+        0x0B,
+        0x30,
+        0x46,
+      ),
+      op,
+    ),
+    "\uFEFFあい\u{2000B}う",
+  );
+  assertStrictEquals(
+    Utf16be.decode(
+      Uint8Array.of(
         0x30,
         0x42,
         0xFE,
@@ -177,6 +216,11 @@ Deno.test("Utf16be.encode(string)", () => {
     "[254,255,48,66,48,68,48,70]",
   );
 
+  assertStrictEquals(
+    JSON.stringify([...Utf16be.encode("\uFEFFあい\u{2000B}う")]),
+    "[254,255,48,66,48,68,216,64,220,11,48,70]",
+  );
+
   // encode(any)
   assertThrows(
     () => {
@@ -216,6 +260,11 @@ Deno.test("Utf16be.encode(string, {})", () => {
     "[254,255,48,66,48,68,48,70]",
   );
 
+  assertStrictEquals(
+    JSON.stringify([...Utf16be.encode("\uFEFFあい\u{2000B}う", op)]),
+    "[254,255,48,66,48,68,216,64,220,11,48,70]",
+  );
+
   // encode(any)
   assertThrows(
     () => {
@@ -224,4 +273,10 @@ Deno.test("Utf16be.encode(string, {})", () => {
     TypeError,
     "input",
   );
+});
+
+Deno.test("Utf16be", () => {
+  const str1 = "👪a👨‍👦👨‍👨‍👦‍👦";
+  const encoded1 = Utf16be.encode(str1);
+  assertStrictEquals(Utf16be.decode(encoded1), str1);
 });
