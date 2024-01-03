@@ -48,10 +48,10 @@ export namespace Utf16be {
       }
     }
 
-    const buffer = new ArrayBuffer(src.length);
+    const buffer = new ArrayBuffer(src.length * 2);
     const view = new DataView(buffer);
     for (let i = 0; i < src.length; i++) {
-      view.setUint16(i, src.charCodeAt(i), false);
+      view.setUint16(i * 2, src.charCodeAt(i), false);
     }
     return new Uint8Array(buffer);
   }
