@@ -3,9 +3,8 @@ import { Encoding } from "./encoding.ts";
 
 let _decoderDiscardBOM: TextDecoder;
 let _decoderPreserveBOM: TextDecoder;
-let _encoder: TextEncoder;
 
-export namespace Utf8 {
+export namespace Utf16be {
   export function decode(
     input: BufferSource = new Uint8Array(0),
     options: Encoding.DecodeOptions = {},
@@ -14,7 +13,7 @@ export namespace Utf8 {
     if (options?.ignoreBOM === true) {
       // preserve BOM
       if (!_decoderPreserveBOM) {
-        _decoderPreserveBOM = new TextDecoder("utf-8", {
+        _decoderPreserveBOM = new TextDecoder("utf-16be", {
           fatal: true,
           ignoreBOM: true,
         });
@@ -23,7 +22,7 @@ export namespace Utf8 {
     } else {
       // discard BOM
       if (!_decoderDiscardBOM) {
-        _decoderDiscardBOM = new TextDecoder("utf-8", {
+        _decoderDiscardBOM = new TextDecoder("utf-16be", {
           fatal: true,
           ignoreBOM: false,
         });
@@ -42,15 +41,18 @@ export namespace Utf8 {
       throw new TypeError("input");
     }
 
-    if (!_encoder) {
-      _encoder = new TextEncoder();
-    }
-
+    let src = input;
     if (options?.prependBOM === true) {
-      if (input.startsWith(BOM) !== true) {
-        return _encoder.encode(BOM + input);
+      if (src.startsWith(BOM) !== true) {
+        src = BOM + src;
       }
     }
-    return _encoder.encode(input);
+
+    const buffer = new ArrayBuffer(src.length);
+    const view = new DataView(buffer);
+    for (let i = 0; i < src.length; i++) {
+      view.setUint16(i, src.charCodeAt(i), false);
+    }
+    return new Uint8Array(buffer);
   }
 }

@@ -204,7 +204,10 @@ Deno.test("Utf8.encode(string, {})", () => {
   const op = { prependBOM: true } as const;
 
   // encode()
-  assertStrictEquals(JSON.stringify([...Utf8.encode(undefined, op)]), "[239,187,191]");
+  assertStrictEquals(
+    JSON.stringify([...Utf8.encode(undefined, op)]),
+    "[239,187,191]",
+  );
 
   // encode(string)
   assertStrictEquals(JSON.stringify([...Utf8.encode("", op)]), "[239,187,191]");
