@@ -1,5 +1,5 @@
 import { assertStrictEquals, assertThrows } from "./deps.ts";
-import { Utf16be, Utf16le } from "../mod.ts";
+import { Utf16le } from "../mod.ts";
 
 Deno.test("Utf16le.decode(BufferSource)", () => {
   // decode()
