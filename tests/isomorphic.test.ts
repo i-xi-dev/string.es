@@ -65,7 +65,15 @@ Deno.test("Isomorphic.encode", () => {
     () => {
       Isomorphic.encode("\u0100");
     },
-    TypeError,
+    RangeError,
+    "input",
+  );
+
+  assertThrows(
+    () => {
+      Isomorphic.encode("あ");
+    },
+    RangeError,
     "input",
   );
 
