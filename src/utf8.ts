@@ -38,10 +38,9 @@ export namespace Utf8 {
   }
 
   export type EncodeOptions = {
-    prependBom?: boolean;
+    prependBOM?: boolean;
   };
 
-  // does not prepend BOM
   export function encode(input = "", options: EncodeOptions = {}): Uint8Array {
     if (isString(input) !== true) {
       throw new TypeError("input");
@@ -51,7 +50,7 @@ export namespace Utf8 {
       _encoder = new TextEncoder();
     }
 
-    if (options?.prependBom === true) {
+    if (options?.prependBOM === true) {
       if (input.startsWith(BOM) !== true) {
         return _encoder.encode(BOM + input);
       }
