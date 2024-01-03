@@ -1,12 +1,12 @@
 import { BOM, isString } from "./main.ts";
 import { Encoding } from "./encoding.ts";
 
-const _LABEL = "utf-16be";
+const _LABEL = "utf-16le";
 
 let _decoderDiscardBOM: TextDecoder;
 let _decoderPreserveBOM: TextDecoder;
 
-export namespace Utf16be {
+export namespace Utf16le {
   export function decode(
     input: BufferSource = new Uint8Array(0),
     options: Encoding.DecodeOptions = {},
@@ -54,7 +54,7 @@ export namespace Utf16be {
     const buffer = new ArrayBuffer(src.length * bytesPerElement);
     const view = new DataView(buffer);
     for (let i = 0; i < src.length; i++) {
-      view.setUint16(i * bytesPerElement, src.charCodeAt(i), false);
+      view.setUint16(i * bytesPerElement, src.charCodeAt(i), true);
     }
     return new Uint8Array(buffer);
   }

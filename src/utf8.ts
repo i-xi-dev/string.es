@@ -1,6 +1,8 @@
 import { BOM, isString } from "./main.ts";
 import { Encoding } from "./encoding.ts";
 
+const _LABEL = "utf-8";
+
 let _decoderDiscardBOM: TextDecoder;
 let _decoderPreserveBOM: TextDecoder;
 let _encoder: TextEncoder;
@@ -14,7 +16,7 @@ export namespace Utf8 {
     if (options?.ignoreBOM === true) {
       // preserve BOM
       if (!_decoderPreserveBOM) {
-        _decoderPreserveBOM = new TextDecoder("utf-8", {
+        _decoderPreserveBOM = new TextDecoder(_LABEL, {
           fatal: true,
           ignoreBOM: true,
         });
@@ -23,7 +25,7 @@ export namespace Utf8 {
     } else {
       // discard BOM
       if (!_decoderDiscardBOM) {
-        _decoderDiscardBOM = new TextDecoder("utf-8", {
+        _decoderDiscardBOM = new TextDecoder(_LABEL, {
           fatal: true,
           ignoreBOM: false,
         });
