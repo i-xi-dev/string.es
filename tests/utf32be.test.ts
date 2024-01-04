@@ -111,6 +111,14 @@ Deno.test("Utf32be.decode(BufferSource)", () => {
     //XXX "input",
   );
 
+  assertThrows(
+    () => {
+      Utf32be.decode(Uint8Array.of(0xFF, 0xFF, 0xFF, 0xFF));
+    },
+    TypeError,
+    "input[*]",
+  );
+
   // decode(any)
   assertThrows(
     () => {
@@ -237,6 +245,14 @@ Deno.test("Utf32be.decode(BufferSource, {})", () => {
     },
     TypeError,
     //XXX "input",
+  );
+
+  assertThrows(
+    () => {
+      Utf32be.decode(Uint8Array.of(0xFF, 0xFF, 0xFF, 0xFF), op);
+    },
+    TypeError,
+    "input[*]",
   );
 
   // decode(any)

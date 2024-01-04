@@ -1,4 +1,5 @@
 import { BOM, isString } from "./main.ts";
+import { CodePoint } from "./code_point.ts";
 import { Encoding } from "./encoding.ts";
 
 const _BE_LABEL = "utf-32be";
@@ -25,9 +26,14 @@ function _decode(
   }
 
   const runes = [];
+  let codePoint: number;
   for (let i = 0; i < view.byteLength; i = i + _BYTES_PER_ELEMENT) {
+    codePoint = view.getUint32(i, label === _LE_LABEL);
+    if (CodePoint.isCodePoint(codePoint) !== true) {
+      throw new TypeError("input[*]");
+    }
     runes.push(
-      String.fromCodePoint(view.getUint32(i, label === _LE_LABEL)),
+      String.fromCodePoint(codePoint),
     );
   }
 
