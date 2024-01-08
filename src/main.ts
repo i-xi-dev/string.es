@@ -1,7 +1,5 @@
 import { NumberEx } from "../deps.ts";
 
-export const BOM = "\uFEFF";
-
 export function isString(test: unknown): test is string {
   return (typeof test === "string");
 }
