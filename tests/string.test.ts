@@ -1,5 +1,7 @@
 import { assertStrictEquals, assertThrows } from "./deps.ts";
-import {
+import { StringEx } from "../mod.ts";
+
+const {
   collectStart,
   contains,
   endsWith,
@@ -10,7 +12,7 @@ import {
   trim,
   trimEnd,
   trimStart,
-} from "../mod.ts";
+} = StringEx;
 
 Deno.test("isNonEmptyString(string)", () => {
   assertStrictEquals(isNonEmptyString(""), false);
