@@ -22,7 +22,7 @@ export namespace CodePoint {
   }
 
   export function toString(source: CodePoint): string {
-    if (isCodePoint(CodePoint)) {
+    if (isCodePoint(source)) {
       return `U+${source.toString(16).toUpperCase().padStart(4, "0")}`;
     }
     throw new RangeError("source");
