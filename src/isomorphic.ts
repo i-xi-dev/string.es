@@ -1,4 +1,4 @@
-import { isString } from "./main.ts";
+import { isString } from "./string.ts";
 
 /**
  * Isomorphic encoding

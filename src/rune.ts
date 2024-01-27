@@ -1,6 +1,6 @@
 import { CodePoint } from "./code_point.ts";
 import { GeneralCategory } from "./general_category.ts";
-import { isString } from "./main.ts";
+import { isString } from "./string.ts";
 
 // 事実上定義できないのでstringの別名とする
 export type Rune = string;
