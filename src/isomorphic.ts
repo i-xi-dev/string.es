@@ -1,4 +1,4 @@
-import { isString } from "./string.ts";
+import { EMPTY, isString } from "./string.ts";
 
 /**
  * Isomorphic encoding
@@ -21,7 +21,7 @@ export namespace Isomorphic {
     }
 
     // A: Bの2倍以上遅い（Node.js）
-    // let chars: string = "";
+    // let chars: string = EMPTY;
     // for (const byte of bytes) {
     //   chars = chars + String.fromCharCode(byte);
     // }
@@ -31,7 +31,7 @@ export namespace Isomorphic {
     const chars = Array.from(bytes, (byte) => {
       return String.fromCharCode(byte);
     });
-    return chars.join("");
+    return chars.join(EMPTY);
   }
 
   /**
@@ -40,7 +40,7 @@ export namespace Isomorphic {
    * @param input A string that does not contain code points greater than `U+00FF`.
    * @returns A byte sequence of isomorphic encoded `input`.
    */
-  export function encode(input = ""): Uint8Array {
+  export function encode(input = EMPTY): Uint8Array {
     if (isString(input) !== true) {
       throw new TypeError("input");
     }

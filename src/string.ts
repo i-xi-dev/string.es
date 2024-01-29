@@ -1,5 +1,7 @@
 import { SafeInteger } from "../deps.ts";
 
+export const EMPTY = "";
+
 export function isString(test: unknown): test is string {
   return (typeof test === "string");
 }
@@ -58,12 +60,12 @@ export function collectStart(input: string, pattern: string): string {
   _assertStringType(input, "input");
 
   if (isNonEmptyString(pattern) !== true) {
-    return "";
+    return EMPTY;
   }
   const results = (new RegExp(`^${pattern}`, "u"))
     .exec(input);
   if (results === null) {
-    return "";
+    return EMPTY;
   }
   return results[0] as string;
 }
@@ -76,7 +78,7 @@ export function trim(input: string, pattern: string): string {
   }
   return input.replace(
     new RegExp(`(?:^${pattern}|${pattern}$)`, "gu"),
-    "",
+    EMPTY,
   );
 }
 
@@ -86,7 +88,7 @@ export function trimStart(input: string, pattern: string): string {
   if (isNonEmptyString(pattern) !== true) {
     return input;
   }
-  return input.replace(new RegExp(`^${pattern}`, "u"), "");
+  return input.replace(new RegExp(`^${pattern}`, "u"), EMPTY);
 }
 
 export function trimEnd(input: string, pattern: string): string {
@@ -95,7 +97,7 @@ export function trimEnd(input: string, pattern: string): string {
   if (isNonEmptyString(pattern) !== true) {
     return input;
   }
-  return input.replace(new RegExp(`${pattern}$`, "u"), "");
+  return input.replace(new RegExp(`${pattern}$`, "u"), EMPTY);
 }
 
 export function* segment(
