@@ -1,5 +1,8 @@
 import { SafeInteger } from "../deps.ts";
 
+/**
+ * The zero-length string.
+ */
 export const EMPTY = "";
 
 export function isString(test: unknown): test is string {
