@@ -1,4 +1,4 @@
-import { assertStrictEquals } from "./deps.ts";
+import { assertStrictEquals, assertThrows } from "./deps.ts";
 import { CodePoint } from "../mod.ts";
 
 Deno.test("CodePoint.isCodePoint(number)", () => {
@@ -31,29 +31,172 @@ Deno.test("CodePoint.isCodePoint(any)", () => {
   assertStrictEquals(CodePoint.isCodePoint(null), false);
 });
 
-Deno.test("CodePoint.isHighSurrogateCodePoint(any)", () => {
-  assertStrictEquals(CodePoint.isHighSurrogateCodePoint(0xD7FF), false);
-  assertStrictEquals(CodePoint.isHighSurrogateCodePoint(0xD800), true);
-  assertStrictEquals(CodePoint.isHighSurrogateCodePoint(0xDBFF), true);
-  assertStrictEquals(CodePoint.isHighSurrogateCodePoint(0xDC00), false);
-  assertStrictEquals(CodePoint.isHighSurrogateCodePoint(0xDFFF), false);
-  assertStrictEquals(CodePoint.isHighSurrogateCodePoint(0xE000), false);
+Deno.test("CodePoint.toString(number)", () => {
+  assertStrictEquals(CodePoint.toString(0x0), "U+0000");
+  assertStrictEquals(CodePoint.toString(0xFFFF), "U+FFFF");
+  assertStrictEquals(CodePoint.toString(0x10000), "U+10000");
+  assertStrictEquals(CodePoint.toString(0x10FFFF), "U+10FFFF");
+
+  assertThrows(
+    () => {
+      CodePoint.toString(-1);
+    },
+    TypeError,
+    "codePoint",
+  );
+
+  assertThrows(
+    () => {
+      CodePoint.toString(0x110000);
+    },
+    TypeError,
+    "codePoint",
+  );
+
+  assertThrows(
+    () => {
+      CodePoint.toString("0" as unknown as number);
+    },
+    TypeError,
+    "codePoint",
+  );
 });
 
-Deno.test("CodePoint.isLowSurrogateCodePoint(any)", () => {
-  assertStrictEquals(CodePoint.isLowSurrogateCodePoint(0xD7FF), false);
-  assertStrictEquals(CodePoint.isLowSurrogateCodePoint(0xD800), false);
-  assertStrictEquals(CodePoint.isLowSurrogateCodePoint(0xDBFF), false);
-  assertStrictEquals(CodePoint.isLowSurrogateCodePoint(0xDC00), true);
-  assertStrictEquals(CodePoint.isLowSurrogateCodePoint(0xDFFF), true);
-  assertStrictEquals(CodePoint.isLowSurrogateCodePoint(0xE000), false);
+Deno.test("CodePoint.isHighSurrogate(any)", () => {
+  assertStrictEquals(CodePoint.isHighSurrogate(0xD7FF), false);
+  assertStrictEquals(CodePoint.isHighSurrogate(0xD800), true);
+  assertStrictEquals(CodePoint.isHighSurrogate(0xDBFF), true);
+  assertStrictEquals(CodePoint.isHighSurrogate(0xDC00), false);
+  assertStrictEquals(CodePoint.isHighSurrogate(0xDFFF), false);
+  assertStrictEquals(CodePoint.isHighSurrogate(0xE000), false);
 });
 
-Deno.test("CodePoint.isSurrogateCodePoint(any)", () => {
-  assertStrictEquals(CodePoint.isSurrogateCodePoint(0xD7FF), false);
-  assertStrictEquals(CodePoint.isSurrogateCodePoint(0xD800), true);
-  assertStrictEquals(CodePoint.isSurrogateCodePoint(0xDBFF), true);
-  assertStrictEquals(CodePoint.isSurrogateCodePoint(0xDC00), true);
-  assertStrictEquals(CodePoint.isSurrogateCodePoint(0xDFFF), true);
-  assertStrictEquals(CodePoint.isSurrogateCodePoint(0xE000), false);
+Deno.test("CodePoint.isLowSurrogate(any)", () => {
+  assertStrictEquals(CodePoint.isLowSurrogate(0xD7FF), false);
+  assertStrictEquals(CodePoint.isLowSurrogate(0xD800), false);
+  assertStrictEquals(CodePoint.isLowSurrogate(0xDBFF), false);
+  assertStrictEquals(CodePoint.isLowSurrogate(0xDC00), true);
+  assertStrictEquals(CodePoint.isLowSurrogate(0xDFFF), true);
+  assertStrictEquals(CodePoint.isLowSurrogate(0xE000), false);
+});
+
+Deno.test("CodePoint.isSurrogate(any)", () => {
+  assertStrictEquals(CodePoint.isSurrogate(0xD7FF), false);
+  assertStrictEquals(CodePoint.isSurrogate(0xD800), true);
+  assertStrictEquals(CodePoint.isSurrogate(0xDBFF), true);
+  assertStrictEquals(CodePoint.isSurrogate(0xDC00), true);
+  assertStrictEquals(CodePoint.isSurrogate(0xDFFF), true);
+  assertStrictEquals(CodePoint.isSurrogate(0xE000), false);
+});
+
+Deno.test("CodePoint.planeOf(number)", () => {
+  assertStrictEquals(CodePoint.planeOf(0x0), 0);
+  assertStrictEquals(CodePoint.planeOf(0xFFFF), 0);
+  assertStrictEquals(CodePoint.planeOf(0x10000), 1);
+  assertStrictEquals(CodePoint.planeOf(0x1FFFF), 1);
+  assertStrictEquals(CodePoint.planeOf(0x20000), 2);
+  assertStrictEquals(CodePoint.planeOf(0x2FFFF), 2);
+  assertStrictEquals(CodePoint.planeOf(0x30000), 3);
+  assertStrictEquals(CodePoint.planeOf(0x3FFFF), 3);
+  assertStrictEquals(CodePoint.planeOf(0x40000), 4);
+  assertStrictEquals(CodePoint.planeOf(0x4FFFF), 4);
+  assertStrictEquals(CodePoint.planeOf(0x50000), 5);
+  assertStrictEquals(CodePoint.planeOf(0x5FFFF), 5);
+  assertStrictEquals(CodePoint.planeOf(0x60000), 6);
+  assertStrictEquals(CodePoint.planeOf(0x6FFFF), 6);
+  assertStrictEquals(CodePoint.planeOf(0x70000), 7);
+  assertStrictEquals(CodePoint.planeOf(0x7FFFF), 7);
+  assertStrictEquals(CodePoint.planeOf(0x80000), 8);
+  assertStrictEquals(CodePoint.planeOf(0x8FFFF), 8);
+  assertStrictEquals(CodePoint.planeOf(0x90000), 9);
+  assertStrictEquals(CodePoint.planeOf(0x9FFFF), 9);
+  assertStrictEquals(CodePoint.planeOf(0xA0000), 10);
+  assertStrictEquals(CodePoint.planeOf(0xAFFFF), 10);
+  assertStrictEquals(CodePoint.planeOf(0xB0000), 11);
+  assertStrictEquals(CodePoint.planeOf(0xBFFFF), 11);
+  assertStrictEquals(CodePoint.planeOf(0xC0000), 12);
+  assertStrictEquals(CodePoint.planeOf(0xCFFFF), 12);
+  assertStrictEquals(CodePoint.planeOf(0xD0000), 13);
+  assertStrictEquals(CodePoint.planeOf(0xDFFFF), 13);
+  assertStrictEquals(CodePoint.planeOf(0xE0000), 14);
+  assertStrictEquals(CodePoint.planeOf(0xEFFFF), 14);
+  assertStrictEquals(CodePoint.planeOf(0xF0000), 15);
+  assertStrictEquals(CodePoint.planeOf(0xFFFFF), 15);
+  assertStrictEquals(CodePoint.planeOf(0x100000), 16);
+  assertStrictEquals(CodePoint.planeOf(0x10FFFF), 16);
+
+  assertThrows(
+    () => {
+      CodePoint.planeOf(-1);
+    },
+    TypeError,
+    "codePoint",
+  );
+
+  assertThrows(
+    () => {
+      CodePoint.planeOf(0x110000);
+    },
+    TypeError,
+    "codePoint",
+  );
+
+  assertThrows(
+    () => {
+      CodePoint.planeOf("0" as unknown as number);
+    },
+    TypeError,
+    "codePoint",
+  );
+});
+
+Deno.test("CodePoint.inPlane(any, number)", () => {
+  assertStrictEquals(CodePoint.inPlane(0x0, 0), true);
+  assertStrictEquals(CodePoint.inPlane(0xFFFF, 0), true);
+  assertStrictEquals(CodePoint.inPlane(0x0, 1), false);
+  assertStrictEquals(CodePoint.inPlane(-1, 0), false);
+  assertStrictEquals(CodePoint.inPlane(0.5, 1), false);
+  assertStrictEquals(CodePoint.inPlane(0x11FFFF, 1), false);
+  assertStrictEquals(CodePoint.inPlane(0x100000, 16), true);
+  assertStrictEquals(CodePoint.inPlane(0x10FFFF, 16), true);
+
+  assertThrows(
+    () => {
+      CodePoint.inPlane(0, undefined as unknown as 0);
+    },
+    TypeError,
+    "plane",
+  );
+
+  assertThrows(
+    () => {
+      CodePoint.inPlane(0, "0" as unknown as 0);
+    },
+    TypeError,
+    "plane",
+  );
+
+  assertThrows(
+    () => {
+      CodePoint.inPlane(0, -1 as 0);
+    },
+    TypeError,
+    "plane",
+  );
+
+  assertThrows(
+    () => {
+      CodePoint.inPlane(0, 17 as 0);
+    },
+    TypeError,
+    "plane",
+  );
+});
+
+Deno.test("CodePoint.isBmp(any)", () => {
+  assertStrictEquals(CodePoint.isBmp(-1), false);
+  assertStrictEquals(CodePoint.isBmp(0x0), true);
+  assertStrictEquals(CodePoint.isBmp(0xFFFF), true);
+  assertStrictEquals(CodePoint.isBmp(0x10000), false);
+  assertStrictEquals(CodePoint.isBmp(0x10FFFF), false);
 });

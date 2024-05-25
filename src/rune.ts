@@ -22,7 +22,7 @@ export namespace Rune {
     if (runes.length !== 1) {
       return false;
     }
-    if (CodePoint.isSurrogateCodePoint(runes[0].codePointAt(0))) {
+    if (CodePoint.isSurrogate(runes[0].codePointAt(0))) {
       return false;
     }
     return true;
@@ -30,7 +30,7 @@ export namespace Rune {
 
   export function fromCodePoint(codePoint: CodePoint): Rune {
     if (CodePoint.isCodePoint(codePoint)) {
-      if (CodePoint.isSurrogateCodePoint(codePoint) !== true) {
+      if (CodePoint.isSurrogate(codePoint) !== true) {
         return String.fromCodePoint(codePoint);
       }
     }
