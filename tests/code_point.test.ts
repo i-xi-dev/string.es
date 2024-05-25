@@ -1,4 +1,5 @@
 import { assertStrictEquals, assertThrows } from "./deps.ts";
+import { Block } from "../mod.ts";
 import { CodePoint } from "../mod.ts";
 
 Deno.test("CodePoint.isCodePoint(number)", () => {
@@ -59,6 +60,89 @@ Deno.test("CodePoint.toString(number)", () => {
     },
     TypeError,
     "codePoint",
+  );
+});
+
+Deno.test("CodePoint.inBlock(any, number)", () => {
+  assertStrictEquals(
+    CodePoint.inBlock(0x0, Block.C0_CONTROLS_AND_BASIC_LATIN),
+    true,
+  );
+  assertStrictEquals(
+    CodePoint.inBlock(0x7F, Block.C0_CONTROLS_AND_BASIC_LATIN),
+    true,
+  );
+  assertStrictEquals(
+    CodePoint.inBlock(0x80, Block.C0_CONTROLS_AND_BASIC_LATIN),
+    false,
+  );
+  assertStrictEquals(
+    CodePoint.inBlock(-1, Block.C0_CONTROLS_AND_BASIC_LATIN),
+    false,
+  );
+
+  assertThrows(
+    () => {
+      CodePoint.inBlock(0, 0 as unknown as Block);
+    },
+    TypeError,
+    "block",
+  );
+});
+
+Deno.test("CodePoint.inBlocks(any, number[])", () => {
+  const blocks1 = [
+    Block.C0_CONTROLS_AND_BASIC_LATIN,
+    Block.C1_CONTROLS_AND_LATIN_1_SUPPLEMENT,
+  ];
+
+  assertStrictEquals(CodePoint.inBlocks(0x0, blocks1), true);
+  assertStrictEquals(CodePoint.inBlocks(0x7F, blocks1), true);
+  assertStrictEquals(CodePoint.inBlocks(0x80, blocks1), true);
+  assertStrictEquals(CodePoint.inBlocks(0xFF, blocks1), true);
+  assertStrictEquals(CodePoint.inBlocks(0x100, blocks1), false);
+  assertStrictEquals(CodePoint.inBlocks(-1, blocks1), false);
+
+  const blocks2 = [
+    Block.C1_CONTROLS_AND_LATIN_1_SUPPLEMENT,
+    Block.C0_CONTROLS_AND_BASIC_LATIN,
+  ];
+
+  assertStrictEquals(CodePoint.inBlocks(0x0, blocks2), true);
+  assertStrictEquals(CodePoint.inBlocks(0x7F, blocks2), true);
+  assertStrictEquals(CodePoint.inBlocks(0x80, blocks2), true);
+  assertStrictEquals(CodePoint.inBlocks(0xFF, blocks2), true);
+  assertStrictEquals(CodePoint.inBlocks(0x100, blocks2), false);
+  assertStrictEquals(CodePoint.inBlocks(-1, blocks2), false);
+
+  assertThrows(
+    () => {
+      CodePoint.inBlocks(0, [0 as unknown as Block]);
+    },
+    TypeError,
+    "block",
+  );
+
+  assertThrows(
+    () => {
+      CodePoint.inBlocks(0, [
+        Block.C0_CONTROLS_AND_BASIC_LATIN,
+        0 as unknown as Block,
+      ]);
+    },
+    TypeError,
+    "block",
+  );
+
+  assertThrows(
+    () => {
+      CodePoint.inBlocks(0, [
+        0 as unknown as Block,
+        Block.C0_CONTROLS_AND_BASIC_LATIN,
+      ]);
+    },
+    TypeError,
+    "block",
   );
 });
 
