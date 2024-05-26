@@ -1,5 +1,7 @@
 import { NumberEx, NumberRange } from "../deps.ts";
-import { Block } from "./block.ts";
+import { Unicode } from "./unicode.ts";
+
+const { Block } = Unicode;
 
 function _isPlane(test: unknown): test is CodePoint.Plane {
   return Number.isSafeInteger(test) &&
@@ -9,7 +11,7 @@ function _isPlane(test: unknown): test is CodePoint.Plane {
 type _CodePointRange = NumberRange;
 
 // https://www.unicode.org/Public/UNIDATA/Blocks.txt
-const _BlockRange: Record<Block, _CodePointRange> = {
+const _BlockRange: Record<Unicode.Block, _CodePointRange> = {
   [Block.C0_CONTROLS_AND_BASIC_LATIN]: [0x0, 0x7F],
   [Block.C1_CONTROLS_AND_LATIN_1_SUPPLEMENT]: [0x80, 0xFF],
   [Block.LATIN_EXTENDED_A]: [0x100, 0x17F],
@@ -438,7 +440,7 @@ export namespace CodePoint {
   //   Object.getOwnPropertySymbols(_BlockRange);
   // }
 
-  export function inBlock(test: unknown, block: Block): boolean {
+  export function inBlock(test: unknown, block: Unicode.Block): boolean {
     const range = _BlockRange[block];
     if (!range) {
       throw new TypeError("block");
@@ -451,7 +453,10 @@ export namespace CodePoint {
     return NumberEx.inRange(test as number, range);
   }
 
-  export function inBlocks(test: unknown, blocks: Iterable<Block>): boolean {
+  export function inBlocks(
+    test: unknown,
+    blocks: Iterable<Unicode.Block>,
+  ): boolean {
     for (const block of blocks) {
       if (!_BlockRange[block]) {
         throw new TypeError("block");

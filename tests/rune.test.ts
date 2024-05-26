@@ -1,5 +1,5 @@
 import { assertStrictEquals, assertThrows } from "./deps.ts";
-import { GeneralCategory, Rune } from "../mod.ts";
+import { Rune, Unicode } from "../mod.ts";
 
 Deno.test("Rune.isRune(string)", () => {
   assertStrictEquals(Rune.isRune(""), false);
@@ -98,7 +98,7 @@ Deno.test("Rune.inGeneralCategory(string, string)", () => {
   );
   assertThrows(
     () => {
-      Rune.inGeneralCategory("0", "x" as GeneralCategory);
+      Rune.inGeneralCategory("0", "x" as Unicode.GeneralCategory);
     },
     RangeError,
     "gc",

@@ -1,6 +1,7 @@
 import { assertStrictEquals, assertThrows } from "./deps.ts";
-import { Block } from "../mod.ts";
+import { Unicode } from "../mod.ts";
 import { CodePoint } from "../mod.ts";
+const { Block } = Unicode;
 
 Deno.test("CodePoint.isCodePoint(number)", () => {
   assertStrictEquals(CodePoint.isCodePoint(-1), false);
@@ -83,7 +84,7 @@ Deno.test("CodePoint.inBlock(any, number)", () => {
 
   assertThrows(
     () => {
-      CodePoint.inBlock(0, 0 as unknown as Block);
+      CodePoint.inBlock(0, 0 as unknown as Unicode.Block);
     },
     TypeError,
     "block",
@@ -117,7 +118,7 @@ Deno.test("CodePoint.inBlocks(any, number[])", () => {
 
   assertThrows(
     () => {
-      CodePoint.inBlocks(0, [0 as unknown as Block]);
+      CodePoint.inBlocks(0, [0 as unknown as Unicode.Block]);
     },
     TypeError,
     "block",
@@ -127,7 +128,7 @@ Deno.test("CodePoint.inBlocks(any, number[])", () => {
     () => {
       CodePoint.inBlocks(0, [
         Block.C0_CONTROLS_AND_BASIC_LATIN,
-        0 as unknown as Block,
+        0 as unknown as Unicode.Block,
       ]);
     },
     TypeError,
@@ -137,7 +138,7 @@ Deno.test("CodePoint.inBlocks(any, number[])", () => {
   assertThrows(
     () => {
       CodePoint.inBlocks(0, [
-        0 as unknown as Block,
+        0 as unknown as Unicode.Block,
         Block.C0_CONTROLS_AND_BASIC_LATIN,
       ]);
     },

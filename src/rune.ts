@@ -1,6 +1,6 @@
 import { CodePoint } from "./code_point.ts";
-import { GeneralCategory } from "./general_category.ts";
 import { isString } from "./string.ts";
+import { Unicode } from "./unicode.ts";
 
 // 事実上定義できないのでstringの別名とする
 export type Rune = string;
@@ -44,8 +44,11 @@ export namespace Rune {
     throw new RangeError("rune");
   }
 
-  export function inGeneralCategory(test: Rune, gc: GeneralCategory): boolean {
-    if (Object.values(GeneralCategory).includes(gc)) {
+  export function inGeneralCategory(
+    test: Rune,
+    gc: Unicode.GeneralCategory,
+  ): boolean {
+    if (Object.values(Unicode.GeneralCategory).includes(gc)) {
       if (isRune(test)) {
         return (new RegExp(`^\\p{gc=${gc}}$`, "u")).test(test);
       }
