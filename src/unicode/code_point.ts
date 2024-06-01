@@ -2,6 +2,7 @@ import { Block } from "./block.ts";
 import { CodePointRange } from "./code_point_range.ts";
 import { NumberEx } from "../../deps.ts";
 import { Plane } from "./plane.ts";
+import { RuneString } from "./rune_string.ts";
 
 // 事実上定義できないのでnumberの別名とする
 export type CodePoint = number;
@@ -95,8 +96,6 @@ export namespace CodePoint {
     return NumberEx.inRange(codePoint, Block.LOW_SURROGATE_AREA);
   }
 
-  //TODO 以下未テスト
-
   export function inRanges(
     codePoint: CodePoint,
     ranges: Array<CodePointRange>,
@@ -129,5 +128,22 @@ export namespace CodePoint {
       }
     }
     return inRanges(codePoint, _SURROGATE_BLOCKS, true);
+  }
+
+  export function toRuneString(
+    codePoint: CodePoint,
+    _checked = false,
+  ): RuneString {
+    if (_checked !== true) {
+      if (isCodePoint(codePoint) !== true) {
+        throw new TypeError("codePoint");
+      }
+    }
+
+    if (isSurrogate(codePoint, true)) {
+      throw new RangeError("codePoint");
+    }
+
+    return String.fromCodePoint(codePoint);
   }
 }
