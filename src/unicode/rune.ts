@@ -1,62 +1,126 @@
 import { CodePoint } from "./code_point.ts";
 import { CodePointRange } from "./code_point_range.ts";
+import { GeneralCategory } from "./general_category.ts";
 import { Plane } from "./plane.ts";
 import { RuneString } from "./rune_string.ts";
+import { Uint16 } from "../../deps.ts";
 
-export namespace Rune {
-  export function toCodePoint(
-    runeString: RuneString,
-    _checked = false,
-  ): CodePoint {
-    if (_checked !== true) {
-      if (RuneString.isRuneString(runeString) !== true) {
-        throw new TypeError("runeString");
-      }
-    }
-    return runeString.codePointAt(0) as CodePoint;
+export class Rune {
+  readonly #codePoint: CodePoint;
+  readonly #value: RuneString;
+
+  private constructor(codePoint: CodePoint) {
+    this.#codePoint = codePoint;
+    this.#value = CodePoint.toRuneString(codePoint, true);
   }
 
-  export function planeOf(runeString: RuneString, _checked = false): Plane {
-    if (_checked !== true) {
-      if (RuneString.isRuneString(runeString) !== true) {
-        throw new TypeError("runeString");
-      }
-    }
-    return CodePoint.planeOf(toCodePoint(runeString, true), true);
+  get plane(): Plane {
+    return CodePoint.planeOf(this.#codePoint, true);
   }
 
-  export function isBmp(runeString: RuneString, _checked = false): boolean {
-    if (_checked !== true) {
-      if (RuneString.isRuneString(runeString) !== true) {
-        throw new TypeError("runeString");
-      }
+  static fromCodePoint(codePoint: CodePoint): Rune {
+    if (CodePoint.isCodePoint(codePoint) !== true) {
+      throw new TypeError("codePoint");
     }
-    return CodePoint.isBmp(toCodePoint(runeString, true), true);
+    return new Rune(codePoint);
   }
 
-  export function inPlanes(
-    runeString: RuneString,
-    planes: Array<Plane>,
-    _checked = false,
+  static fromRuneString(runeString: RuneString): Rune {
+    return new Rune(RuneString.toCodePoint(runeString));
+  }
+
+  // charCodesは [Uint16] | [Uint16, Uint16]
+  static fromCharCodes(charCodes: Iterable<number>): Rune {
+    const temp = [];
+    let count = 0;
+    for (const charCode of charCodes) {
+      if (count >= 2) {
+        throw new TypeError("charCodes");
+      }
+
+      if (Uint16.isUint16(charCode) !== true) {
+        throw new TypeError(`charCodes[${count}]`);
+      }
+
+      temp.push(charCode);
+      count++;
+    }
+
+    if (temp.length <= 0) {
+      throw new TypeError("charCodes");
+    }
+
+    const charCode0 = temp[0];
+    if (
+      (temp.length === 1) && (CodePoint.isSurrogate(charCode0, true) !== true)
+    ) { // ここではcharCodeはcodePointに等しい
+      return Rune.fromRuneString(String.fromCharCode(charCode0));
+    }
+    const charCode1 = temp[1];
+    if (
+      (temp.length === 2) && CodePoint.isHighSurrogate(charCode0, true) &&
+      CodePoint.isLowSurrogate(charCode1, true)
+    ) {
+      return Rune.fromRuneString(
+        String.fromCharCode(charCode0) + String.fromCharCode(charCode1),
+      );
+    }
+
+    throw new RangeError("charCodes");
+  }
+
+  toCodePoint(): CodePoint {
+    return this.#codePoint;
+  }
+
+  toRuneString(): RuneString {
+    return this.#value;
+  }
+
+  toCharCodes(): [Uint16] | [Uint16, Uint16] {
+    const charCode0 = this.#value.charCodeAt(0);
+    if (this.#value.length === 1) {
+      return [charCode0];
+    } else {
+      return [charCode0, this.#value.charCodeAt(1)];
+    }
+  }
+
+  toString(): RuneString {
+    return this.toRuneString();
+  }
+
+  isBmp(): boolean {
+    return CodePoint.isBmp(this.#codePoint, true);
+  }
+
+  inPlanes(planes: Array<Plane>): boolean {
+    return CodePoint.inPlanes(this.#codePoint, planes, true);
+  }
+
+  inCodePointRanges(ranges: Array<CodePointRange>): boolean {
+    return CodePoint.inRanges(this.#codePoint, ranges, true);
+  }
+
+  matchesScripts(
+    scripts: Array<string>,
+    excludeScriptExtensions = false,
   ): boolean {
-    if (_checked !== true) {
-      if (RuneString.isRuneString(runeString) !== true) {
-        throw new TypeError("runeString");
-      }
-    }
-    return CodePoint.inPlanes(toCodePoint(runeString, true), planes, true);
+    return RuneString.matchesScripts(
+      this.#value,
+      scripts,
+      excludeScriptExtensions,
+      true,
+    );
   }
 
-  export function inCodePointRanges(
-    runeString: RuneString,
-    ranges: Array<CodePointRange>,
-    _checked = false,
+  matchesGeneralCategories(
+    includeCategories: Array<GeneralCategory>,
   ): boolean {
-    if (_checked !== true) {
-      if (RuneString.isRuneString(runeString) !== true) {
-        throw new TypeError("runeString");
-      }
-    }
-    return CodePoint.inRanges(toCodePoint(runeString, true), ranges, true);
+    return RuneString.matchesGeneralCategories(
+      this.#value,
+      includeCategories,
+      true,
+    );
   }
 }
