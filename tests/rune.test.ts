@@ -38,3 +38,113 @@ Deno.test("Rune.prototype.plane", () => {
   assertStrictEquals(Rune.fromCodePoint(0x100000).plane, 16);
   assertStrictEquals(Rune.fromCodePoint(0x10FFFF).plane, 16);
 });
+
+Deno.test("Rune.fromCodePoint(number), Rune.prototype.toCodePoint()", () => {
+  assertStrictEquals(Rune.fromCodePoint(0).toCodePoint(), 0);
+  assertStrictEquals(Rune.fromCodePoint(0x10FFFF).toCodePoint(), 0x10FFFF);
+  assertStrictEquals(Rune.fromCodePoint(0xD7FF).toCodePoint(), 0xD7FF);
+  assertStrictEquals(Rune.fromCodePoint(0xE000).toCodePoint(), 0xE000);
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(-1);
+    },
+    TypeError,
+    "codePoint",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0x110000);
+    },
+    TypeError,
+    "codePoint",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0xD800);
+    },
+    RangeError,
+    "codePoint",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0xDFFF);
+    },
+    RangeError,
+    "codePoint",
+  );
+});
+
+Deno.test("Rune.fromRuneString(number)", () => {
+  assertStrictEquals(Rune.fromRuneString("\u{0}").toCodePoint(), 0);
+  assertStrictEquals(Rune.fromRuneString("\u{10FFFF}").toCodePoint(), 0x10FFFF);
+  assertStrictEquals(Rune.fromRuneString("\u{D7FF}").toCodePoint(), 0xD7FF);
+  assertStrictEquals(Rune.fromRuneString("\u{E000}").toCodePoint(), 0xE000);
+
+  assertThrows(
+    () => {
+      Rune.fromRuneString("");
+    },
+    TypeError,
+    "runeString",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromRuneString("00");
+    },
+    TypeError,
+    "runeString",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromRuneString("\uD800");
+    },
+    TypeError,
+    "runeString",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromRuneString("\uDFFF");
+    },
+    TypeError,
+    "runeString",
+  );
+});
+
+//TODO fromCharCodes
+
+Deno.test("Rune.prototype.toRuneString()", () => {
+  assertStrictEquals(Rune.fromCodePoint(0).toRuneString(), "\u{0}");
+  assertStrictEquals(Rune.fromCodePoint(0x10FFFF).toRuneString(), "\u{10FFFF}");
+  assertStrictEquals(Rune.fromCodePoint(0xD7FF).toRuneString(), "\u{D7FF}");
+  assertStrictEquals(Rune.fromCodePoint(0xE000).toRuneString(), "\u{E000}");
+});
+
+//TODO toCharCodes
+
+Deno.test("Rune.prototype.toString()", () => {
+  assertStrictEquals(Rune.fromCodePoint(0).toString(), "\u{0}");
+  assertStrictEquals(Rune.fromCodePoint(0x10FFFF).toString(), "\u{10FFFF}");
+  assertStrictEquals(Rune.fromCodePoint(0xD7FF).toString(), "\u{D7FF}");
+  assertStrictEquals(Rune.fromCodePoint(0xE000).toString(), "\u{E000}");
+});
+
+Deno.test("Rune.prototype.isBmp()", () => {
+  assertStrictEquals(Rune.fromCodePoint(0).isBmp(), true);
+  assertStrictEquals(Rune.fromCodePoint(0xFFFF).isBmp(), true);
+  assertStrictEquals(Rune.fromCodePoint(0x10000).isBmp(), false);
+  assertStrictEquals(Rune.fromCodePoint(0x10FFFF).isBmp(), false);
+});
+
+
+
+//inPlanes
+//inCodePointRanges
+//matchesScripts
+//matchesGeneralCategories
