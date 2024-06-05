@@ -183,6 +183,62 @@ Deno.test("RuneString.fromCharCodes(number[])", () => {
   );
 });
 
+Deno.test("RuneString.toCharCodes(string)", () => {
+  assertStrictEquals(RuneString.toCharCodes("\u{0}").join(","), "0");
+  assertStrictEquals(RuneString.toCharCodes("\u{FFFF}").join(","), "65535");
+  assertStrictEquals(RuneString.toCharCodes("\u{D7FF}").join(","), "55295");
+  assertStrictEquals(RuneString.toCharCodes("\u{E000}").join(","), "57344");
+
+  assertStrictEquals(
+    RuneString.toCharCodes("\uD800\uDC00").join(","),
+    "55296,56320",
+  );
+
+  assertThrows(
+    () => {
+      RuneString.toCharCodes("\uD800");
+    },
+    TypeError,
+    "runeString",
+  );
+  assertThrows(
+    () => {
+      RuneString.toCharCodes("\uDBFF");
+    },
+    TypeError,
+    "runeString",
+  );
+  assertThrows(
+    () => {
+      RuneString.toCharCodes("\uDC00");
+    },
+    TypeError,
+    "runeString",
+  );
+  assertThrows(
+    () => {
+      RuneString.toCharCodes("\uDFFF");
+    },
+    TypeError,
+    "runeString",
+  );
+
+  assertThrows(
+    () => {
+      RuneString.toCharCodes("");
+    },
+    TypeError,
+    "runeString",
+  );
+  assertThrows(
+    () => {
+      RuneString.toCharCodes("00");
+    },
+    TypeError,
+    "runeString",
+  );
+});
+
 Deno.test("RuneString.planeOf(string)", () => {
   assertStrictEquals(RuneString.planeOf("\u{0}"), 0);
   assertStrictEquals(RuneString.planeOf("\u{FFFF}"), 0);

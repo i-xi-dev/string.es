@@ -43,12 +43,7 @@ export class Rune {
   }
 
   toCharCodes(): [Uint16] | [Uint16, Uint16] {
-    const charCode0 = this.#value.charCodeAt(0);
-    if (this.#value.length === 1) {
-      return [charCode0];
-    } else {
-      return [charCode0, this.#value.charCodeAt(1)];
-    }
+    return RuneString.toCharCodes(this.#value, true);
   }
 
   isBmp(): boolean {

@@ -128,6 +128,24 @@ export namespace RuneString {
     throw new RangeError("charCodes");
   }
 
+  export function toCharCodes(
+    runeString: RuneString,
+    _checked = false,
+  ): [Uint16] | [Uint16, Uint16] {
+    if (_checked !== true) {
+      if (RuneString.isRuneString(runeString) !== true) {
+        throw new TypeError("runeString");
+      }
+    }
+
+    const charCode0 = runeString.charCodeAt(0);
+    if (runeString.length === 1) {
+      return [charCode0];
+    } else {
+      return [charCode0, runeString.charCodeAt(1)];
+    }
+  }
+
   export function planeOf(runeString: RuneString, _checked = false): Plane {
     if (_checked !== true) {
       if (RuneString.isRuneString(runeString) !== true) {

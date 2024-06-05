@@ -194,7 +194,26 @@ Deno.test("Rune.prototype.toString()", () => {
   assertStrictEquals(Rune.fromCodePoint(0xE000).toString(), "\u{E000}");
 });
 
-//TODO toCharCodes
+Deno.test("Rune.prototype.toCharCodes(string)", () => {
+  assertStrictEquals(Rune.fromCodePoint(0).toCharCodes().join(","), "0");
+  assertStrictEquals(
+    Rune.fromCodePoint(0xFFFF).toCharCodes().join(","),
+    "65535",
+  );
+  assertStrictEquals(
+    Rune.fromCodePoint(0xD7FF).toCharCodes().join(","),
+    "55295",
+  );
+  assertStrictEquals(
+    Rune.fromCodePoint(0xE000).toCharCodes().join(","),
+    "57344",
+  );
+
+  assertStrictEquals(
+    Rune.fromCodePoint(0x10000).toCharCodes().join(","),
+    "55296,56320",
+  );
+});
 
 Deno.test("Rune.prototype.isBmp()", () => {
   assertStrictEquals(Rune.fromCodePoint(0).isBmp(), true);
