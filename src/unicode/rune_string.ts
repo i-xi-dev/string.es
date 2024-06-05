@@ -61,6 +61,23 @@ export namespace RuneString {
     return true;
   }
 
+  export function fromCodePoint(
+    codePoint: CodePoint,
+    _checked = false,
+  ): RuneString {
+    if (_checked !== true) {
+      if (CodePoint.isCodePoint(codePoint) !== true) {
+        throw new TypeError("codePoint");
+      }
+    }
+
+    if (CodePoint.isSurrogate(codePoint, true)) {
+      throw new RangeError("codePoint");
+    }
+
+    return String.fromCodePoint(codePoint);
+  }
+
   export function toCodePoint(
     runeString: RuneString,
     _checked = false,

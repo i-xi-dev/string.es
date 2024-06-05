@@ -11,7 +11,7 @@ export class Rune {
 
   private constructor(codePoint: CodePoint) {
     this.#codePoint = codePoint;
-    this.#value = CodePoint.toRuneString(codePoint, true);
+    this.#value = RuneString.fromCodePoint(codePoint, true);
   }
 
   get plane(): Plane {
