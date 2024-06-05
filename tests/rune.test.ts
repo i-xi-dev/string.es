@@ -1,6 +1,6 @@
 import { assertStrictEquals, assertThrows } from "./deps.ts";
 import { Unicode } from "../mod.ts";
-const { Block, Rune } = Unicode;
+const { Block, GeneralCategory, Rune } = Unicode;
 
 Deno.test("Rune.prototype.plane", () => {
   assertStrictEquals(Rune.fromCodePoint(0).plane, 0);
@@ -280,126 +280,59 @@ Deno.test("Rune.prototype.inCodePointRanges(number[])", () => {
 });
 
 Deno.test("Rune.prototype.matchesScripts(string[], boolean?)", () => {
+  const hiraA = Rune.fromString("あ");
+  const kanaA = Rune.fromString("ア");
+  const ch = Rune.fromString("ー");
+  const d1 = Rune.fromString("1");
+
   const scripts0 = ["Hira"];
 
-  assertStrictEquals(Rune.fromString("あ").matchesScripts(scripts0), true);
-  assertStrictEquals(
-    Rune.fromString("あ").matchesScripts(scripts0, false),
-    true,
-  );
-  assertStrictEquals(
-    Rune.fromString("あ").matchesScripts(scripts0, true),
-    true,
-  );
-  assertStrictEquals(Rune.fromString("ア").matchesScripts(scripts0), false);
-  assertStrictEquals(
-    Rune.fromString("ア").matchesScripts(scripts0, false),
-    false,
-  );
-  assertStrictEquals(
-    Rune.fromString("ア").matchesScripts(scripts0, true),
-    false,
-  );
-  assertStrictEquals(Rune.fromString("ー").matchesScripts(scripts0), true);
-  assertStrictEquals(
-    Rune.fromString("ー").matchesScripts(scripts0, false),
-    true,
-  );
-  assertStrictEquals(
-    Rune.fromString("ー").matchesScripts(scripts0, true),
-    false,
-  );
-  assertStrictEquals(Rune.fromString("1").matchesScripts(scripts0), false);
-  assertStrictEquals(
-    Rune.fromString("1").matchesScripts(scripts0, false),
-    false,
-  );
-  assertStrictEquals(
-    Rune.fromString("1").matchesScripts(scripts0, true),
-    false,
-  );
+  assertStrictEquals(hiraA.matchesScripts(scripts0), true);
+  assertStrictEquals(hiraA.matchesScripts(scripts0, false), true);
+  assertStrictEquals(hiraA.matchesScripts(scripts0, true), true);
+  assertStrictEquals(kanaA.matchesScripts(scripts0), false);
+  assertStrictEquals(kanaA.matchesScripts(scripts0, false), false);
+  assertStrictEquals(kanaA.matchesScripts(scripts0, true), false);
+  assertStrictEquals(ch.matchesScripts(scripts0), true);
+  assertStrictEquals(ch.matchesScripts(scripts0, false), true);
+  assertStrictEquals(ch.matchesScripts(scripts0, true), false);
+  assertStrictEquals(d1.matchesScripts(scripts0), false);
+  assertStrictEquals(d1.matchesScripts(scripts0, false), false);
+  assertStrictEquals(d1.matchesScripts(scripts0, true), false);
 
   const scripts1 = ["Hira", "Kana"];
 
-  assertStrictEquals(Rune.fromString("あ").matchesScripts(scripts1), true);
-  assertStrictEquals(
-    Rune.fromString("あ").matchesScripts(scripts1, false),
-    true,
-  );
-  assertStrictEquals(
-    Rune.fromString("あ").matchesScripts(scripts1, true),
-    true,
-  );
-  assertStrictEquals(Rune.fromString("ア").matchesScripts(scripts1), true);
-  assertStrictEquals(
-    Rune.fromString("ア").matchesScripts(scripts1, false),
-    true,
-  );
-  assertStrictEquals(
-    Rune.fromString("ア").matchesScripts(scripts1, true),
-    true,
-  );
-  assertStrictEquals(Rune.fromString("ー").matchesScripts(scripts1), true);
-  assertStrictEquals(
-    Rune.fromString("ー").matchesScripts(scripts1, false),
-    true,
-  );
-  assertStrictEquals(
-    Rune.fromString("ー").matchesScripts(scripts1, true),
-    false,
-  );
-  assertStrictEquals(Rune.fromString("1").matchesScripts(scripts1), false);
-  assertStrictEquals(
-    Rune.fromString("1").matchesScripts(scripts1, false),
-    false,
-  );
-  assertStrictEquals(
-    Rune.fromString("1").matchesScripts(scripts1, true),
-    false,
-  );
+  assertStrictEquals(hiraA.matchesScripts(scripts1), true);
+  assertStrictEquals(hiraA.matchesScripts(scripts1, false), true);
+  assertStrictEquals(hiraA.matchesScripts(scripts1, true), true);
+  assertStrictEquals(kanaA.matchesScripts(scripts1), true);
+  assertStrictEquals(kanaA.matchesScripts(scripts1, false), true);
+  assertStrictEquals(kanaA.matchesScripts(scripts1, true), true);
+  assertStrictEquals(ch.matchesScripts(scripts1), true);
+  assertStrictEquals(ch.matchesScripts(scripts1, false), true);
+  assertStrictEquals(ch.matchesScripts(scripts1, true), false);
+  assertStrictEquals(d1.matchesScripts(scripts1), false);
+  assertStrictEquals(d1.matchesScripts(scripts1, false), false);
+  assertStrictEquals(d1.matchesScripts(scripts1, true), false);
 
   const scripts2: string[] = [];
 
-  assertStrictEquals(Rune.fromString("あ").matchesScripts(scripts2), false);
-  assertStrictEquals(
-    Rune.fromString("あ").matchesScripts(scripts2, false),
-    false,
-  );
-  assertStrictEquals(
-    Rune.fromString("あ").matchesScripts(scripts2, true),
-    false,
-  );
-  assertStrictEquals(Rune.fromString("ア").matchesScripts(scripts2), false);
-  assertStrictEquals(
-    Rune.fromString("ア").matchesScripts(scripts2, false),
-    false,
-  );
-  assertStrictEquals(
-    Rune.fromString("ア").matchesScripts(scripts2, true),
-    false,
-  );
-  assertStrictEquals(Rune.fromString("ー").matchesScripts(scripts2), false);
-  assertStrictEquals(
-    Rune.fromString("ー").matchesScripts(scripts2, false),
-    false,
-  );
-  assertStrictEquals(
-    Rune.fromString("ー").matchesScripts(scripts2, true),
-    false,
-  );
-  assertStrictEquals(Rune.fromString("1").matchesScripts(scripts2), false);
-  assertStrictEquals(
-    Rune.fromString("1").matchesScripts(scripts2, false),
-    false,
-  );
-  assertStrictEquals(
-    Rune.fromString("1").matchesScripts(scripts2, true),
-    false,
-  );
+  assertStrictEquals(hiraA.matchesScripts(scripts2), false);
+  assertStrictEquals(hiraA.matchesScripts(scripts2, false), false);
+  assertStrictEquals(hiraA.matchesScripts(scripts2, true), false);
+  assertStrictEquals(kanaA.matchesScripts(scripts2), false);
+  assertStrictEquals(kanaA.matchesScripts(scripts2, false), false);
+  assertStrictEquals(kanaA.matchesScripts(scripts2, true), false);
+  assertStrictEquals(ch.matchesScripts(scripts2), false);
+  assertStrictEquals(ch.matchesScripts(scripts2, false), false);
+  assertStrictEquals(ch.matchesScripts(scripts2, true), false);
+  assertStrictEquals(d1.matchesScripts(scripts2), false);
+  assertStrictEquals(d1.matchesScripts(scripts2, false), false);
+  assertStrictEquals(d1.matchesScripts(scripts2, true), false);
 
   assertThrows(
     () => {
-      Rune.fromString("1").matchesScripts(null as unknown as []);
+      d1.matchesScripts(null as unknown as []);
     },
     TypeError,
     "scripts",
@@ -407,32 +340,103 @@ Deno.test("Rune.prototype.matchesScripts(string[], boolean?)", () => {
 
   assertThrows(
     () => {
-      Rune.fromString("1").matchesScripts(["HIRA"]);
+      d1.matchesScripts(["HIRA"]);
     },
     TypeError,
     "scripts[*]",
   );
   assertThrows(
     () => {
-      Rune.fromString("1").matchesScripts(["hira"]);
+      d1.matchesScripts(["hira"]);
     },
     TypeError,
     "scripts[*]",
   );
   assertThrows(
     () => {
-      Rune.fromString("1").matchesScripts(["Latn", "HIRA"]);
+      d1.matchesScripts(["Latn", "HIRA"]);
     },
     TypeError,
     "scripts[*]",
   );
   assertThrows(
     () => {
-      Rune.fromString("1").matchesScripts(["HIRA", "Latn"]);
+      d1.matchesScripts(["HIRA", "Latn"]);
     },
     TypeError,
     "scripts[*]",
   );
 });
 
-//matchesGeneralCategories
+Deno.test("Rune.prototype.matchesGeneralCategories(string[])", () => {
+  const latnA = Rune.fromString("A");
+  const d1 = Rune.fromString("1");
+  const hiraA = Rune.fromString("あ");
+  const fs = Rune.fromString(".");
+
+  const cats0: Array<Unicode.GeneralCategory> = [];
+
+  assertStrictEquals(latnA.matchesGeneralCategories(cats0), false);
+  assertStrictEquals(d1.matchesGeneralCategories(cats0), false);
+  assertStrictEquals(hiraA.matchesGeneralCategories(cats0), false);
+  assertStrictEquals(fs.matchesGeneralCategories(cats0), false);
+
+  const cats1 = [GeneralCategory.LETTER];
+
+  assertStrictEquals(latnA.matchesGeneralCategories(cats1), true);
+  assertStrictEquals(d1.matchesGeneralCategories(cats1), false);
+  assertStrictEquals(hiraA.matchesGeneralCategories(cats1), true);
+  assertStrictEquals(fs.matchesGeneralCategories(cats1), false);
+
+  const cats2 = [GeneralCategory.NUMBER];
+
+  assertStrictEquals(latnA.matchesGeneralCategories(cats2), false);
+  assertStrictEquals(d1.matchesGeneralCategories(cats2), true);
+  assertStrictEquals(hiraA.matchesGeneralCategories(cats2), false);
+  assertStrictEquals(fs.matchesGeneralCategories(cats2), false);
+
+  const cats3 = [GeneralCategory.LETTER, GeneralCategory.NUMBER];
+
+  assertStrictEquals(latnA.matchesGeneralCategories(cats3), true);
+  assertStrictEquals(d1.matchesGeneralCategories(cats3), true);
+  assertStrictEquals(hiraA.matchesGeneralCategories(cats3), true);
+  assertStrictEquals(fs.matchesGeneralCategories(cats3), false);
+
+  assertThrows(
+    () => {
+      d1.matchesGeneralCategories(
+        0 as unknown as Unicode.GeneralCategory[],
+      );
+    },
+    TypeError,
+    "generalCategories",
+  );
+
+  assertThrows(
+    () => {
+      d1.matchesGeneralCategories(
+        ["l"] as unknown as Unicode.GeneralCategory[],
+      );
+    },
+    TypeError,
+    "generalCategories[*]",
+  );
+  assertThrows(
+    () => {
+      d1.matchesGeneralCategories(
+        ["L", "l"] as unknown as Unicode.GeneralCategory[],
+      );
+    },
+    TypeError,
+    "generalCategories[*]",
+  );
+  assertThrows(
+    () => {
+      d1.matchesGeneralCategories(
+        ["l", "L"] as unknown as Unicode.GeneralCategory[],
+      );
+    },
+    TypeError,
+    "generalCategories[*]",
+  );
+});
