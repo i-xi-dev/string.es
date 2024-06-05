@@ -142,9 +142,134 @@ Deno.test("Rune.prototype.isBmp()", () => {
   assertStrictEquals(Rune.fromCodePoint(0x10FFFF).isBmp(), false);
 });
 
+Deno.test("Rune.prototype.inPlanes(number[])", () => {
+  assertStrictEquals(Rune.fromCodePoint(0).inPlanes([]), false);
+
+  assertStrictEquals(Rune.fromCodePoint(0).inPlanes([0]), true);
+  assertStrictEquals(Rune.fromCodePoint(0xFFFF).inPlanes([0]), true);
+  assertStrictEquals(Rune.fromCodePoint(0).inPlanes([1]), false);
+  assertStrictEquals(Rune.fromCodePoint(0x100000).inPlanes([16]), true);
+  assertStrictEquals(Rune.fromCodePoint(0x10FFFF).inPlanes([16]), true);
+
+  assertStrictEquals(Rune.fromCodePoint(0).inPlanes([0, 16]), true);
+  assertStrictEquals(Rune.fromCodePoint(0xFFFF).inPlanes([0, 16]), true);
+  assertStrictEquals(Rune.fromCodePoint(0).inPlanes([1, 16]), false);
+  assertStrictEquals(Rune.fromCodePoint(0x100000).inPlanes([0, 16]), true);
+  assertStrictEquals(Rune.fromCodePoint(0x10FFFF).inPlanes([0, 16]), true);
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0).inPlanes(undefined as unknown as []);
+    },
+    TypeError,
+    "planes",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0).inPlanes("0" as unknown as []);
+    },
+    TypeError,
+    "planes",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0).inPlanes([-1] as unknown as []);
+    },
+    TypeError,
+    "planes[*]",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0).inPlanes([17] as unknown as []);
+    },
+    TypeError,
+    "planes[*]",
+  );
+});
+
+Deno.test("Rune.prototype.inCodePointRanges(number[])", () => {
+  const blocks0: Array<[number] | [number, number]> = [];
+
+  assertStrictEquals(Rune.fromCodePoint(0).inCodePointRanges(blocks0), false);
+  assertStrictEquals(Rune.fromCodePoint(0x7F).inCodePointRanges(blocks0), false);
+  assertStrictEquals(Rune.fromCodePoint(0x80).inCodePointRanges(blocks0), false);
+  assertStrictEquals(Rune.fromCodePoint(0xFF).inCodePointRanges(blocks0), false);
+  assertStrictEquals(Rune.fromCodePoint(0x100).inCodePointRanges(blocks0), false);
+
+  const blocks1 = [
+    Block.C0_CONTROLS_AND_BASIC_LATIN,
+    Block.C1_CONTROLS_AND_LATIN_1_SUPPLEMENT,
+  ];
+
+  assertStrictEquals(Rune.fromCodePoint(0).inCodePointRanges(blocks1), true);
+  assertStrictEquals(Rune.fromCodePoint(0x7F).inCodePointRanges(blocks1), true);
+  assertStrictEquals(Rune.fromCodePoint(0x80).inCodePointRanges(blocks1), true);
+  assertStrictEquals(Rune.fromCodePoint(0xFF).inCodePointRanges(blocks1), true);
+  assertStrictEquals(Rune.fromCodePoint(0x100).inCodePointRanges(blocks1), false);
+
+  const blocks2 = [
+    Block.C1_CONTROLS_AND_LATIN_1_SUPPLEMENT,
+    Block.C0_CONTROLS_AND_BASIC_LATIN,
+  ];
+
+  assertStrictEquals(Rune.fromCodePoint(0).inCodePointRanges(blocks2), true);
+  assertStrictEquals(Rune.fromCodePoint(0x7F).inCodePointRanges(blocks2), true);
+  assertStrictEquals(Rune.fromCodePoint(0x80).inCodePointRanges(blocks2), true);
+  assertStrictEquals(Rune.fromCodePoint(0xFF).inCodePointRanges(blocks2), true);
+  assertStrictEquals(Rune.fromCodePoint(0x100).inCodePointRanges(blocks2), false);
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0).inCodePointRanges(undefined as unknown as []);
+    },
+    TypeError,
+    "ranges",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0).inCodePointRanges(0 as unknown as []);
+    },
+    TypeError,
+    "ranges",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0).inCodePointRanges([0 as unknown as [0]]);
+    },
+    TypeError,
+    "ranges[*]",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0).inCodePointRanges([
+        Block.C0_CONTROLS_AND_BASIC_LATIN,
+        0 as unknown as [0],
+      ]);
+    },
+    TypeError,
+    "ranges[*]",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCodePoint(0).inCodePointRanges([
+        0 as unknown as [0],
+        Block.C0_CONTROLS_AND_BASIC_LATIN,
+      ]);
+    },
+    TypeError,
+    "ranges[*]",
+  );
+});
 
 
-//inPlanes
-//inCodePointRanges
+
+
 //matchesScripts
 //matchesGeneralCategories
