@@ -78,15 +78,15 @@ Deno.test("Rune.fromCodePoint(number), Rune.prototype.toCodePoint()", () => {
   );
 });
 
-Deno.test("Rune.fromRuneString(number)", () => {
-  assertStrictEquals(Rune.fromRuneString("\u{0}").toCodePoint(), 0);
-  assertStrictEquals(Rune.fromRuneString("\u{10FFFF}").toCodePoint(), 0x10FFFF);
-  assertStrictEquals(Rune.fromRuneString("\u{D7FF}").toCodePoint(), 0xD7FF);
-  assertStrictEquals(Rune.fromRuneString("\u{E000}").toCodePoint(), 0xE000);
+Deno.test("Rune.fromString(number)", () => {
+  assertStrictEquals(Rune.fromString("\u{0}").toCodePoint(), 0);
+  assertStrictEquals(Rune.fromString("\u{10FFFF}").toCodePoint(), 0x10FFFF);
+  assertStrictEquals(Rune.fromString("\u{D7FF}").toCodePoint(), 0xD7FF);
+  assertStrictEquals(Rune.fromString("\u{E000}").toCodePoint(), 0xE000);
 
   assertThrows(
     () => {
-      Rune.fromRuneString("");
+      Rune.fromString("");
     },
     TypeError,
     "runeString",
@@ -94,7 +94,7 @@ Deno.test("Rune.fromRuneString(number)", () => {
 
   assertThrows(
     () => {
-      Rune.fromRuneString("00");
+      Rune.fromString("00");
     },
     TypeError,
     "runeString",
@@ -102,7 +102,7 @@ Deno.test("Rune.fromRuneString(number)", () => {
 
   assertThrows(
     () => {
-      Rune.fromRuneString("\uD800");
+      Rune.fromString("\uD800");
     },
     TypeError,
     "runeString",
@@ -110,7 +110,7 @@ Deno.test("Rune.fromRuneString(number)", () => {
 
   assertThrows(
     () => {
-      Rune.fromRuneString("\uDFFF");
+      Rune.fromString("\uDFFF");
     },
     TypeError,
     "runeString",
@@ -119,21 +119,14 @@ Deno.test("Rune.fromRuneString(number)", () => {
 
 //TODO fromCharCodes
 
-Deno.test("Rune.prototype.toRuneString()", () => {
-  assertStrictEquals(Rune.fromCodePoint(0).toRuneString(), "\u{0}");
-  assertStrictEquals(Rune.fromCodePoint(0x10FFFF).toRuneString(), "\u{10FFFF}");
-  assertStrictEquals(Rune.fromCodePoint(0xD7FF).toRuneString(), "\u{D7FF}");
-  assertStrictEquals(Rune.fromCodePoint(0xE000).toRuneString(), "\u{E000}");
-});
-
-//TODO toCharCodes
-
 Deno.test("Rune.prototype.toString()", () => {
   assertStrictEquals(Rune.fromCodePoint(0).toString(), "\u{0}");
   assertStrictEquals(Rune.fromCodePoint(0x10FFFF).toString(), "\u{10FFFF}");
   assertStrictEquals(Rune.fromCodePoint(0xD7FF).toString(), "\u{D7FF}");
   assertStrictEquals(Rune.fromCodePoint(0xE000).toString(), "\u{E000}");
 });
+
+//TODO toCharCodes
 
 Deno.test("Rune.prototype.isBmp()", () => {
   assertStrictEquals(Rune.fromCodePoint(0).isBmp(), true);
@@ -194,10 +187,22 @@ Deno.test("Rune.prototype.inCodePointRanges(number[])", () => {
   const blocks0: Array<[number] | [number, number]> = [];
 
   assertStrictEquals(Rune.fromCodePoint(0).inCodePointRanges(blocks0), false);
-  assertStrictEquals(Rune.fromCodePoint(0x7F).inCodePointRanges(blocks0), false);
-  assertStrictEquals(Rune.fromCodePoint(0x80).inCodePointRanges(blocks0), false);
-  assertStrictEquals(Rune.fromCodePoint(0xFF).inCodePointRanges(blocks0), false);
-  assertStrictEquals(Rune.fromCodePoint(0x100).inCodePointRanges(blocks0), false);
+  assertStrictEquals(
+    Rune.fromCodePoint(0x7F).inCodePointRanges(blocks0),
+    false,
+  );
+  assertStrictEquals(
+    Rune.fromCodePoint(0x80).inCodePointRanges(blocks0),
+    false,
+  );
+  assertStrictEquals(
+    Rune.fromCodePoint(0xFF).inCodePointRanges(blocks0),
+    false,
+  );
+  assertStrictEquals(
+    Rune.fromCodePoint(0x100).inCodePointRanges(blocks0),
+    false,
+  );
 
   const blocks1 = [
     Block.C0_CONTROLS_AND_BASIC_LATIN,
@@ -208,7 +213,10 @@ Deno.test("Rune.prototype.inCodePointRanges(number[])", () => {
   assertStrictEquals(Rune.fromCodePoint(0x7F).inCodePointRanges(blocks1), true);
   assertStrictEquals(Rune.fromCodePoint(0x80).inCodePointRanges(blocks1), true);
   assertStrictEquals(Rune.fromCodePoint(0xFF).inCodePointRanges(blocks1), true);
-  assertStrictEquals(Rune.fromCodePoint(0x100).inCodePointRanges(blocks1), false);
+  assertStrictEquals(
+    Rune.fromCodePoint(0x100).inCodePointRanges(blocks1),
+    false,
+  );
 
   const blocks2 = [
     Block.C1_CONTROLS_AND_LATIN_1_SUPPLEMENT,
@@ -219,7 +227,10 @@ Deno.test("Rune.prototype.inCodePointRanges(number[])", () => {
   assertStrictEquals(Rune.fromCodePoint(0x7F).inCodePointRanges(blocks2), true);
   assertStrictEquals(Rune.fromCodePoint(0x80).inCodePointRanges(blocks2), true);
   assertStrictEquals(Rune.fromCodePoint(0xFF).inCodePointRanges(blocks2), true);
-  assertStrictEquals(Rune.fromCodePoint(0x100).inCodePointRanges(blocks2), false);
+  assertStrictEquals(
+    Rune.fromCodePoint(0x100).inCodePointRanges(blocks2),
+    false,
+  );
 
   assertThrows(
     () => {
@@ -268,8 +279,160 @@ Deno.test("Rune.prototype.inCodePointRanges(number[])", () => {
   );
 });
 
+Deno.test("Rune.prototype.matchesScripts(string[], boolean?)", () => {
+  const scripts0 = ["Hira"];
 
+  assertStrictEquals(Rune.fromString("あ").matchesScripts(scripts0), true);
+  assertStrictEquals(
+    Rune.fromString("あ").matchesScripts(scripts0, false),
+    true,
+  );
+  assertStrictEquals(
+    Rune.fromString("あ").matchesScripts(scripts0, true),
+    true,
+  );
+  assertStrictEquals(Rune.fromString("ア").matchesScripts(scripts0), false);
+  assertStrictEquals(
+    Rune.fromString("ア").matchesScripts(scripts0, false),
+    false,
+  );
+  assertStrictEquals(
+    Rune.fromString("ア").matchesScripts(scripts0, true),
+    false,
+  );
+  assertStrictEquals(Rune.fromString("ー").matchesScripts(scripts0), true);
+  assertStrictEquals(
+    Rune.fromString("ー").matchesScripts(scripts0, false),
+    true,
+  );
+  assertStrictEquals(
+    Rune.fromString("ー").matchesScripts(scripts0, true),
+    false,
+  );
+  assertStrictEquals(Rune.fromString("1").matchesScripts(scripts0), false);
+  assertStrictEquals(
+    Rune.fromString("1").matchesScripts(scripts0, false),
+    false,
+  );
+  assertStrictEquals(
+    Rune.fromString("1").matchesScripts(scripts0, true),
+    false,
+  );
 
+  const scripts1 = ["Hira", "Kana"];
 
-//matchesScripts
+  assertStrictEquals(Rune.fromString("あ").matchesScripts(scripts1), true);
+  assertStrictEquals(
+    Rune.fromString("あ").matchesScripts(scripts1, false),
+    true,
+  );
+  assertStrictEquals(
+    Rune.fromString("あ").matchesScripts(scripts1, true),
+    true,
+  );
+  assertStrictEquals(Rune.fromString("ア").matchesScripts(scripts1), true);
+  assertStrictEquals(
+    Rune.fromString("ア").matchesScripts(scripts1, false),
+    true,
+  );
+  assertStrictEquals(
+    Rune.fromString("ア").matchesScripts(scripts1, true),
+    true,
+  );
+  assertStrictEquals(Rune.fromString("ー").matchesScripts(scripts1), true);
+  assertStrictEquals(
+    Rune.fromString("ー").matchesScripts(scripts1, false),
+    true,
+  );
+  assertStrictEquals(
+    Rune.fromString("ー").matchesScripts(scripts1, true),
+    false,
+  );
+  assertStrictEquals(Rune.fromString("1").matchesScripts(scripts1), false);
+  assertStrictEquals(
+    Rune.fromString("1").matchesScripts(scripts1, false),
+    false,
+  );
+  assertStrictEquals(
+    Rune.fromString("1").matchesScripts(scripts1, true),
+    false,
+  );
+
+  const scripts2: string[] = [];
+
+  assertStrictEquals(Rune.fromString("あ").matchesScripts(scripts2), false);
+  assertStrictEquals(
+    Rune.fromString("あ").matchesScripts(scripts2, false),
+    false,
+  );
+  assertStrictEquals(
+    Rune.fromString("あ").matchesScripts(scripts2, true),
+    false,
+  );
+  assertStrictEquals(Rune.fromString("ア").matchesScripts(scripts2), false);
+  assertStrictEquals(
+    Rune.fromString("ア").matchesScripts(scripts2, false),
+    false,
+  );
+  assertStrictEquals(
+    Rune.fromString("ア").matchesScripts(scripts2, true),
+    false,
+  );
+  assertStrictEquals(Rune.fromString("ー").matchesScripts(scripts2), false);
+  assertStrictEquals(
+    Rune.fromString("ー").matchesScripts(scripts2, false),
+    false,
+  );
+  assertStrictEquals(
+    Rune.fromString("ー").matchesScripts(scripts2, true),
+    false,
+  );
+  assertStrictEquals(Rune.fromString("1").matchesScripts(scripts2), false);
+  assertStrictEquals(
+    Rune.fromString("1").matchesScripts(scripts2, false),
+    false,
+  );
+  assertStrictEquals(
+    Rune.fromString("1").matchesScripts(scripts2, true),
+    false,
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromString("1").matchesScripts(null as unknown as []);
+    },
+    TypeError,
+    "scripts",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromString("1").matchesScripts(["HIRA"]);
+    },
+    TypeError,
+    "scripts[*]",
+  );
+  assertThrows(
+    () => {
+      Rune.fromString("1").matchesScripts(["hira"]);
+    },
+    TypeError,
+    "scripts[*]",
+  );
+  assertThrows(
+    () => {
+      Rune.fromString("1").matchesScripts(["Latn", "HIRA"]);
+    },
+    TypeError,
+    "scripts[*]",
+  );
+  assertThrows(
+    () => {
+      Rune.fromString("1").matchesScripts(["HIRA", "Latn"]);
+    },
+    TypeError,
+    "scripts[*]",
+  );
+});
+
 //matchesGeneralCategories

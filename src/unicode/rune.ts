@@ -25,7 +25,7 @@ export class Rune {
     return new Rune(codePoint);
   }
 
-  static fromRuneString(runeString: RuneString): Rune {
+  static fromString(runeString: RuneString): Rune {
     return new Rune(RuneString.toCodePoint(runeString));
   }
 
@@ -54,14 +54,14 @@ export class Rune {
     if (
       (temp.length === 1) && (CodePoint.isSurrogate(charCode0, true) !== true)
     ) { // ここではcharCodeはcodePointに等しい
-      return Rune.fromRuneString(String.fromCharCode(charCode0));
+      return Rune.fromString(String.fromCharCode(charCode0));
     }
     const charCode1 = temp[1];
     if (
       (temp.length === 2) && CodePoint.isHighSurrogate(charCode0, true) &&
       CodePoint.isLowSurrogate(charCode1, true)
     ) {
-      return Rune.fromRuneString(
+      return Rune.fromString(
         String.fromCharCode(charCode0) + String.fromCharCode(charCode1),
       );
     }
@@ -73,7 +73,7 @@ export class Rune {
     return this.#codePoint;
   }
 
-  toRuneString(): RuneString {
+  toString(): RuneString {
     return this.#value;
   }
 
@@ -84,10 +84,6 @@ export class Rune {
     } else {
       return [charCode0, this.#value.charCodeAt(1)];
     }
-  }
-
-  toString(): RuneString {
-    return this.toRuneString();
   }
 
   isBmp(): boolean {
