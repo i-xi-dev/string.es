@@ -117,7 +117,75 @@ Deno.test("Rune.fromString(number)", () => {
   );
 });
 
-//TODO fromCharCodes
+Deno.test("Rune.fromCharCodes(number[])", () => {
+  assertStrictEquals(Rune.fromCharCodes([0]).toString(), "\u{0}");
+  assertStrictEquals(Rune.fromCharCodes([0xFFFF]).toString(), "\u{FFFF}");
+  assertStrictEquals(Rune.fromCharCodes([0xD7FF]).toString(), "\u{D7FF}");
+  assertStrictEquals(Rune.fromCharCodes([0xE000]).toString(), "\u{E000}");
+
+  assertStrictEquals(
+    Rune.fromCharCodes([0xD800, 0xDC00]).toString(),
+    "\uD800\uDC00",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCharCodes([0xD800]);
+    },
+    RangeError,
+    "charCodes",
+  );
+  assertThrows(
+    () => {
+      Rune.fromCharCodes([0xDBFF]);
+    },
+    RangeError,
+    "charCodes",
+  );
+  assertThrows(
+    () => {
+      Rune.fromCharCodes([0xDC00]);
+    },
+    RangeError,
+    "charCodes",
+  );
+  assertThrows(
+    () => {
+      Rune.fromCharCodes([0xDFFF]);
+    },
+    RangeError,
+    "charCodes",
+  );
+
+  assertThrows(
+    () => {
+      Rune.fromCharCodes([]);
+    },
+    TypeError,
+    "charCodes",
+  );
+  assertThrows(
+    () => {
+      Rune.fromCharCodes([0, 0, 0]);
+    },
+    TypeError,
+    "charCodes",
+  );
+  assertThrows(
+    () => {
+      Rune.fromCharCodes([0, -1]);
+    },
+    TypeError,
+    "charCodes[1]",
+  );
+  assertThrows(
+    () => {
+      Rune.fromCharCodes([0x10000, 1]);
+    },
+    TypeError,
+    "charCodes[0]",
+  );
+});
 
 Deno.test("Rune.prototype.toString()", () => {
   assertStrictEquals(Rune.fromCodePoint(0).toString(), "\u{0}");

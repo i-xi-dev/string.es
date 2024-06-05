@@ -3,6 +3,7 @@ import { CodePointRange } from "./code_point_range.ts";
 import { EMPTY, isString } from "../string.ts";
 import { GeneralCategory } from "./general_category.ts";
 import { Plane } from "./plane.ts";
+import { Uint16 } from "../../deps.ts";
 
 // scriptは、UnicodeのScript（≒ISO 15924のScript、Intl.Localeのscript）
 function _isScript(test: unknown): boolean {
@@ -88,6 +89,43 @@ export namespace RuneString {
       }
     }
     return runeString.codePointAt(0) as CodePoint;
+  }
+
+  export function fromCharCodes(charCodes: Iterable<number>): RuneString {
+    const temp = [];
+    let count = 0;
+    for (const charCode of charCodes) {
+      if (count >= 2) {
+        throw new TypeError("charCodes");
+      }
+
+      if (Uint16.isUint16(charCode) !== true) {
+        throw new TypeError(`charCodes[${count}]`);
+      }
+
+      temp.push(charCode);
+      count++;
+    }
+
+    if (temp.length <= 0) {
+      throw new TypeError("charCodes");
+    }
+
+    const charCode0 = temp[0];
+    if (
+      (temp.length === 1) && (CodePoint.isSurrogate(charCode0, true) !== true)
+    ) { // ここではcharCodeはcodePointに等しい
+      return String.fromCharCode(charCode0);
+    }
+    const charCode1 = temp[1];
+    if (
+      (temp.length === 2) && CodePoint.isHighSurrogate(charCode0, true) &&
+      CodePoint.isLowSurrogate(charCode1, true)
+    ) {
+      return String.fromCharCode(charCode0) + String.fromCharCode(charCode1);
+    }
+
+    throw new RangeError("charCodes");
   }
 
   export function planeOf(runeString: RuneString, _checked = false): Plane {
