@@ -17,9 +17,15 @@ Deno.test("RuneString.isRuneString(any)", () => {
   assertStrictEquals(RuneString.isRuneString("\u{DFFF}"), false);
   assertStrictEquals(RuneString.isRuneString("\u{E000}"), true);
 
+  assertStrictEquals(RuneString.isRuneString("\u{10000}"), true);
   assertStrictEquals(RuneString.isRuneString("\u{10000}\u{D800}"), false);
   assertStrictEquals(RuneString.isRuneString("\u{DC00}\u{D800}"), false);
+  assertStrictEquals(RuneString.isRuneString("\uD7FF\uDC00"), false);
   assertStrictEquals(RuneString.isRuneString("\u{D800}\u{DC00}"), true);
+  assertStrictEquals(RuneString.isRuneString("🤷🏽‍♀️"), false);
+
+  assertStrictEquals(RuneString.isRuneString(undefined), false);
+  assertStrictEquals(RuneString.isRuneString(1), false);
 });
 
 Deno.test("RuneString.fromCodePoint(any)", () => {
@@ -27,6 +33,14 @@ Deno.test("RuneString.fromCodePoint(any)", () => {
   assertStrictEquals(RuneString.fromCodePoint(0x10FFFF), "\u{10FFFF}");
   assertStrictEquals(RuneString.fromCodePoint(0xD7FF), "\u{D7FF}");
   assertStrictEquals(RuneString.fromCodePoint(0xE000), "\u{E000}");
+
+  assertThrows(
+    () => {
+      RuneString.fromCodePoint("" as unknown as number);
+    },
+    TypeError,
+    "codePoint",
+  );
 
   assertThrows(
     () => {
