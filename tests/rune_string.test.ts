@@ -487,6 +487,21 @@ Deno.test("RuneString.inCodePointRanges(string, number[])", () => {
   );
 });
 
+Deno.test("RuneString.isVariationSelector(string)", () => {
+  assertStrictEquals(RuneString.isVariationSelector("\uFDFF"), false);
+  assertStrictEquals(RuneString.isVariationSelector("\uFE00"), true);
+  assertStrictEquals(RuneString.isVariationSelector("\uFE0F"), true);
+  assertStrictEquals(RuneString.isVariationSelector("\uFE10"), false);
+  assertStrictEquals(RuneString.isVariationSelector("\u{E00FF}"), false);
+  assertStrictEquals(RuneString.isVariationSelector("\u{E0100}"), true);
+  assertStrictEquals(RuneString.isVariationSelector("\u{E01EF}"), true);
+  assertStrictEquals(RuneString.isVariationSelector("\u{E01F0}"), false);
+  assertStrictEquals(RuneString.isVariationSelector("\u180A"), false);
+  assertStrictEquals(RuneString.isVariationSelector("\u180B"), true);
+  assertStrictEquals(RuneString.isVariationSelector("\u180F"), true);
+  assertStrictEquals(RuneString.isVariationSelector("\u1810"), false);
+});
+
 Deno.test("RuneString.matchesScripts(string, string[], boolean?)", () => {
   const scripts0 = ["Hira"];
 

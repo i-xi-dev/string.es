@@ -366,6 +366,21 @@ Deno.test("Rune.prototype.inCodePointRanges(number[])", () => {
   );
 });
 
+Deno.test("Rune.prototype.isVariationSelector()", () => {
+  assertStrictEquals(Rune.fromCodePoint(0xFDFF).isVariationSelector(), false);
+  assertStrictEquals(Rune.fromCodePoint(0xFE00).isVariationSelector(), true);
+  assertStrictEquals(Rune.fromCodePoint(0xFE0F).isVariationSelector(), true);
+  assertStrictEquals(Rune.fromCodePoint(0xFE10).isVariationSelector(), false);
+  assertStrictEquals(Rune.fromCodePoint(0xE00FF).isVariationSelector(), false);
+  assertStrictEquals(Rune.fromCodePoint(0xE0100).isVariationSelector(), true);
+  assertStrictEquals(Rune.fromCodePoint(0xE01EF).isVariationSelector(), true);
+  assertStrictEquals(Rune.fromCodePoint(0xE01F0).isVariationSelector(), false);
+  assertStrictEquals(Rune.fromCodePoint(0x180A).isVariationSelector(), false);
+  assertStrictEquals(Rune.fromCodePoint(0x180B).isVariationSelector(), true);
+  assertStrictEquals(Rune.fromCodePoint(0x180F).isVariationSelector(), true);
+  assertStrictEquals(Rune.fromCodePoint(0x1810).isVariationSelector(), false);
+});
+
 Deno.test("Rune.prototype.matchesScripts(string[], boolean?)", () => {
   const hiraA = Rune.fromString("あ");
   const kanaA = Rune.fromString("ア");

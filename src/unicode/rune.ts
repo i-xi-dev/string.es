@@ -58,6 +58,10 @@ export class Rune {
     return CodePoint.inRanges(this.#codePoint, ranges, true);
   }
 
+  isVariationSelector(): boolean {
+    return CodePoint.isVariationSelector(this.#codePoint, true);
+  }
+
   matchesScripts(
     scripts: Array<string>,
     excludeScriptExtensions = false,

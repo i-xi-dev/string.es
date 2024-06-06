@@ -198,6 +198,20 @@ export namespace RuneString {
     );
   }
 
+  export function isVariationSelector(
+    runeString: RuneString,
+    _checked = false,
+  ): boolean {
+    if (_checked !== true) {
+      if (RuneString.isRuneString(runeString) !== true) {
+        throw new TypeError("runeString");
+      }
+    }
+    return CodePoint.isVariationSelector(
+      RuneString.toCodePoint(runeString, true),
+    );
+  }
+
   export function matchesScripts(
     runeString: RuneString,
     scripts: Array<string>,

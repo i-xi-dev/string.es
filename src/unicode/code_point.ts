@@ -8,11 +8,30 @@ export type CodePoint = number;
 
 const _BMP = 0;
 
-const _SURROGATE_BLOCKS = [Block.HIGH_SURROGATE_AREA, Block.LOW_SURROGATE_AREA];
+const _SURROGATES = [Block.HIGH_SURROGATE_AREA, Block.LOW_SURROGATE_AREA];
+const _VSS = [
+  Block.VARIATION_SELECTORS,
+  Block.VARIATION_SELECTORS_SUPPLEMENT,
+  [0x180B, 0x180F],
+] as CodePointRange[];
+//TODO c0,c1,
 
 function _isPlane(test: unknown): test is Plane {
   return Number.isSafeInteger(test) &&
     NumberEx.inRange(test as number, [0, 16]);
+}
+
+function _inRange(
+  codePoint: CodePoint,
+  range: CodePointRange,
+  checked: boolean,
+) {
+  if (checked !== true) {
+    if (CodePoint.isCodePoint(codePoint) !== true) {
+      throw new TypeError("codePoint");
+    }
+  }
+  return NumberEx.inRange(codePoint, range);
 }
 
 export namespace CodePoint {
@@ -75,24 +94,14 @@ export namespace CodePoint {
     codePoint: CodePoint,
     _checked = false,
   ): boolean {
-    if (_checked !== true) {
-      if (isCodePoint(codePoint) !== true) {
-        throw new TypeError("codePoint");
-      }
-    }
-    return NumberEx.inRange(codePoint, Block.HIGH_SURROGATE_AREA);
+    return _inRange(codePoint, Block.HIGH_SURROGATE_AREA, _checked);
   }
 
   export function isLowSurrogate(
     codePoint: CodePoint,
     _checked = false,
   ): boolean {
-    if (_checked !== true) {
-      if (isCodePoint(codePoint) !== true) {
-        throw new TypeError("codePoint");
-      }
-    }
-    return NumberEx.inRange(codePoint, Block.LOW_SURROGATE_AREA);
+    return _inRange(codePoint, Block.LOW_SURROGATE_AREA, _checked);
   }
 
   export function inRanges(
@@ -121,11 +130,13 @@ export namespace CodePoint {
   }
 
   export function isSurrogate(codePoint: CodePoint, _checked = false): boolean {
-    if (_checked !== true) {
-      if (isCodePoint(codePoint) !== true) {
-        throw new TypeError("codePoint");
-      }
-    }
-    return inRanges(codePoint, _SURROGATE_BLOCKS, true);
+    return inRanges(codePoint, _SURROGATES, _checked);
+  }
+
+  export function isVariationSelector(
+    codePoint: CodePoint,
+    _checked = false,
+  ): boolean {
+    return inRanges(codePoint, _VSS, _checked);
   }
 }
