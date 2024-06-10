@@ -31,4 +31,68 @@ Deno.test("Rune.prototype.runeCount", () => {
 });
 
 Deno.test("Rune.fromString(string)", () => {
+  assertStrictEquals(RuneSequence.fromString("").toString(), "");
+  assertStrictEquals(RuneSequence.fromString("0").toString(), "0");
+  assertStrictEquals(
+    RuneSequence.fromString("\u{10000}").toString(),
+    "\u{10000}",
+  );
+  assertStrictEquals(
+    RuneSequence.fromString("\u{10FFFF}").toString(),
+    "\u{10FFFF}",
+  );
+
+  assertStrictEquals(RuneSequence.fromString("00").toString(), "00");
+  assertStrictEquals(
+    RuneSequence.fromString("\u{10000}0").toString(),
+    "\u{10000}0",
+  );
+  assertStrictEquals(
+    RuneSequence.fromString("\u{10000}\u{10000}").toString(),
+    "\u{10000}\u{10000}",
+  );
+
+  assertStrictEquals(
+    RuneSequence.fromString("\uD800\uDC00").toString(),
+    "\uD800\uDC00",
+  );
+
+  assertThrows(
+    () => {
+      RuneSequence.fromString("\uD800");
+    },
+    TypeError,
+    "runeString",
+  );
+  assertThrows(
+    () => {
+      RuneSequence.fromString("\uDFFF");
+    },
+    TypeError,
+    "runeString",
+  );
+  assertThrows(
+    () => {
+      RuneSequence.fromString("\uDFFF");
+    },
+    TypeError,
+    "runeString",
+  );
+  assertThrows(
+    () => {
+      RuneSequence.fromString("\uDC00\uD800");
+    },
+    TypeError,
+    "runeString",
+  );
+  assertThrows(
+    () => {
+      RuneSequence.fromString("0\uD8000");
+    },
+    TypeError,
+    "runeString",
+  );
+});
+
+Deno.test("Rune.fromRunes(Rune[])", () => {
 });
