@@ -1,6 +1,8 @@
 import { RuneSequence } from "./rune_sequence.ts";
 
-export class GraphemeCluster extends RuneSequence {
+export class GraphemeCluster {
+  //readonly #runes: RuneSequence;
+  readonly #locale?: Intl.Locale;
 
   //TODO
   // - クラスタ数が1でなければエラー

@@ -2,6 +2,13 @@ import { assertStrictEquals, assertThrows } from "./deps.ts";
 import { Unicode } from "../mod.ts";
 const { Block, GeneralCategory, Rune } = Unicode;
 
+Deno.test("Rune.prototype.charCount", () => {
+  assertStrictEquals(Rune.fromCodePoint(0).charCount, 1);
+  assertStrictEquals(Rune.fromCodePoint(0xFFFF).charCount, 1);
+  assertStrictEquals(Rune.fromCodePoint(0x10000).charCount, 2);
+  assertStrictEquals(Rune.fromCodePoint(0x10FFFF).charCount, 2);
+});
+
 Deno.test("Rune.prototype.plane", () => {
   assertStrictEquals(Rune.fromCodePoint(0).plane, 0);
   assertStrictEquals(Rune.fromCodePoint(0xFFFF).plane, 0);

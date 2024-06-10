@@ -3,7 +3,7 @@ import { CodePointRange } from "./code_point_range.ts";
 import { GeneralCategory } from "./general_category.ts";
 import { Plane } from "./plane.ts";
 import { RuneString } from "./rune_string.ts";
-import { Uint16 } from "../../deps.ts";
+import { SafeInteger, Uint16 } from "../../deps.ts";
 
 export class Rune {
   readonly #codePoint: CodePoint;
@@ -12,6 +12,10 @@ export class Rune {
   private constructor(codePoint: CodePoint) {
     this.#codePoint = codePoint;
     this.#value = RuneString.fromCodePoint(codePoint, true);
+  }
+
+  get charCount(): SafeInteger {
+    return this.#value.length;
   }
 
   get plane(): Plane {
