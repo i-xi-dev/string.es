@@ -49,13 +49,16 @@ export namespace RuneString {
     }
 
     //XXX 以降は、将来的には右記で良い const t = [...test];t.length===1&&t[0].isWellFormed()
-    const runeStrings = [...test];
-    if (runeStrings.length !== 1) {
+    const runeStringSequence = [...test];
+    if (runeStringSequence.length !== 1) {
       return false;
     }
     if (
       (test.length === 1) &&
-      CodePoint.isSurrogate(runeStrings[0].codePointAt(0) as CodePoint, true)
+      CodePoint.isSurrogate(
+        runeStringSequence[0].codePointAt(0) as CodePoint,
+        true,
+      )
     ) {
       return false;
     }

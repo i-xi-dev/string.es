@@ -1,6 +1,7 @@
-import { EMPTY, isNonEmptyString } from "../string.ts";
+import { CodePoint } from "./code_point.ts";
+import { EMPTY, isNonEmptyString, isString } from "../string.ts";
 import { Rune } from "./rune.ts";
-import { SafeInteger } from "../../deps.ts";
+import { SafeInteger, Uint16 } from "../../deps.ts";
 
 export class RuneSequence {
   readonly #runes: Array<Rune>;
@@ -30,7 +31,20 @@ export class RuneSequence {
     //   throw new RangeError("source");
     // }
     return RuneSequence.fromRunes(
-      [...source].map((rune) => Rune.fromString(rune)),
+      [...source].map((runeString) => Rune.fromString(runeString)),
+    );
+  }
+
+  static fromRuneStrings(runeStringSequence: Iterable<string>): RuneSequence {
+    if (
+      isString(runeStringSequence) ||
+      ((Symbol.iterator in runeStringSequence) !== true)
+    ) {
+      throw new TypeError("");
+    }
+
+    return RuneSequence.fromRunes(
+      [...runeStringSequence].map((runeString) => Rune.fromString(runeString)),
     );
   }
 
@@ -39,10 +53,22 @@ export class RuneSequence {
   }
 
   toString(): string {
-    return this.#runes.map((rune) => rune.toString()).join(EMPTY);
+    return this.toRuneStrings().join(EMPTY);
+  }
+
+  toRuneStrings(): Array<string> {
+    return this.#runes.map((rune) => rune.toString());
   }
 
   toRunes(): Array<Rune> {
     return this.#runes.map((rune) => Rune.fromCodePoint(rune.toCodePoint()));
+  }
+
+  toCodePoints(): Array<CodePoint> {
+    return this.#runes.map((rune) => rune.toCodePoint());
+  }
+
+  toCharCodes(): Array<[Uint16] | [Uint16, Uint16]> {
+    return this.#runes.map((rune) => rune.toCharCodes());
   }
 }

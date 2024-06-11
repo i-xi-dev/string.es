@@ -1,8 +1,8 @@
 import { assertStrictEquals, assertThrows } from "./deps.ts";
 import { Unicode } from "../mod.ts";
-const { RuneSequence } = Unicode;
+const { Rune, RuneSequence } = Unicode;
 
-Deno.test("Rune.prototype.charCount", () => {
+Deno.test("RuneSequence.prototype.charCount", () => {
   assertStrictEquals(RuneSequence.fromString("").charCount, 0);
   assertStrictEquals(RuneSequence.fromString("0").charCount, 1);
   assertStrictEquals(RuneSequence.fromString("\u{10000}").charCount, 2);
@@ -16,7 +16,7 @@ Deno.test("Rune.prototype.charCount", () => {
   );
 });
 
-Deno.test("Rune.prototype.runeCount", () => {
+Deno.test("RuneSequence.prototype.runeCount", () => {
   assertStrictEquals(RuneSequence.fromString("").runeCount, 0);
   assertStrictEquals(RuneSequence.fromString("0").runeCount, 1);
   assertStrictEquals(RuneSequence.fromString("\u{10000}").runeCount, 1);
@@ -30,7 +30,7 @@ Deno.test("Rune.prototype.runeCount", () => {
   );
 });
 
-Deno.test("Rune.fromString(string)", () => {
+Deno.test("RuneSequence.fromString(string) , RuneSequence.prototype.toString()", () => {
   assertStrictEquals(RuneSequence.fromString("").toString(), "");
   assertStrictEquals(RuneSequence.fromString("0").toString(), "0");
   assertStrictEquals(
@@ -94,5 +94,67 @@ Deno.test("Rune.fromString(string)", () => {
   );
 });
 
-Deno.test("Rune.fromRunes(Rune[])", () => {
+Deno.test("RuneSequence.fromRuneStrings(string[]) , RuneSequence.prototype.toRuneStrings()", () => {
+  assertStrictEquals(
+    RuneSequence.fromRuneStrings([]).toRuneStrings().join(","),
+    "",
+  );
+  assertStrictEquals(
+    RuneSequence.fromRuneStrings(["\u0000"]).toRuneStrings().join(","),
+    "\u0000",
+  );
+  assertStrictEquals(
+    RuneSequence.fromRuneStrings([
+      "\u0000",
+      "\uFFFF",
+      "\u{10000}",
+      "\u{10FFFF}",
+    ]).toRuneStrings().join(","),
+    "\u0000,\uFFFF,\u{10000},\u{10FFFF}",
+  );
 });
+
+Deno.test("RuneSequence.fromRunes(Rune[]) , RuneSequence.prototype.toRunes()", () => {
+  assertStrictEquals(RuneSequence.fromRunes([]).toString(), "");
+  assertStrictEquals(
+    RuneSequence.fromRunes([
+      Rune.fromString("\u0000"),
+    ]).toString(),
+    "\u0000",
+  );
+  assertStrictEquals(
+    RuneSequence.fromRunes([
+      Rune.fromString("\u0000"),
+      Rune.fromString("\uFFFF"),
+      Rune.fromString("\u{10000}"),
+      Rune.fromString("\u{10FFFF}"),
+    ]).toString(),
+    "\u0000\uFFFF\u{10000}\u{10FFFF}",
+  );
+
+  assertStrictEquals(
+    RuneSequence.fromRunes([]).toRunes().map((rune) => rune.toString()).join(
+      ",",
+    ),
+    "",
+  );
+  assertStrictEquals(
+    RuneSequence.fromRunes([
+      Rune.fromString("\u0000"),
+    ]).toRunes().map((rune) => rune.toString()).join(","),
+    "\u0000",
+  );
+  assertStrictEquals(
+    RuneSequence.fromRunes([
+      Rune.fromString("\u0000"),
+      Rune.fromString("\uFFFF"),
+      Rune.fromString("\u{10000}"),
+      Rune.fromString("\u{10FFFF}"),
+    ]).toRunes().map((rune) => rune.toString()).join(","),
+    "\u0000,\uFFFF,\u{10000},\u{10FFFF}",
+  );
+});
+
+//TODO
+//toCodePoints
+//toCharCodes
