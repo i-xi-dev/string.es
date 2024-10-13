@@ -1,27 +1,20 @@
 import { SafeInteger } from "../deps.ts";
+import { Type } from "../deps.ts";
+
+type int = number;
 
 /**
  * The zero-length string.
  */
 export const EMPTY = "";
 
-export function isString(test: unknown): test is string {
-  return (typeof test === "string");
-}
-
 export function isNonEmptyString(test: unknown): boolean {
-  return isString(test) && (test.length > 0);
-}
-
-function _assertStringType(test: unknown, name: string): void {
-  if (isString(test) !== true) {
-    throw new TypeError(name);
-  }
+  return Type.isString(test) && (test.length > 0);
 }
 
 export function matches(input: string, pattern: string): boolean {
-  _assertStringType(input, "input");
-  _assertStringType(pattern, "pattern");
+  Type.assertString(input, "input");
+  Type.assertString(pattern, "pattern");
 
   if (pattern.length <= 0) {
     return false;
@@ -30,8 +23,8 @@ export function matches(input: string, pattern: string): boolean {
 }
 
 export function contains(input: string, pattern: string): boolean {
-  _assertStringType(input, "input");
-  _assertStringType(pattern, "pattern");
+  Type.assertString(input, "input");
+  Type.assertString(pattern, "pattern");
 
   if (pattern.length <= 0) {
     return false;
@@ -40,8 +33,8 @@ export function contains(input: string, pattern: string): boolean {
 }
 
 export function startsWith(input: string, pattern: string): boolean {
-  _assertStringType(input, "input");
-  _assertStringType(pattern, "pattern");
+  Type.assertString(input, "input");
+  Type.assertString(pattern, "pattern");
 
   if (pattern.length <= 0) {
     return false;
@@ -50,8 +43,8 @@ export function startsWith(input: string, pattern: string): boolean {
 }
 
 export function endsWith(input: string, pattern: string): boolean {
-  _assertStringType(input, "input");
-  _assertStringType(pattern, "pattern");
+  Type.assertString(input, "input");
+  Type.assertString(pattern, "pattern");
 
   if (pattern.length <= 0) {
     return false;
@@ -60,7 +53,7 @@ export function endsWith(input: string, pattern: string): boolean {
 }
 
 export function collectStart(input: string, pattern: string): string {
-  _assertStringType(input, "input");
+  Type.assertString(input, "input");
 
   if (isNonEmptyString(pattern) !== true) {
     return EMPTY;
@@ -74,7 +67,7 @@ export function collectStart(input: string, pattern: string): string {
 }
 
 export function trim(input: string, pattern: string): string {
-  _assertStringType(input, "input");
+  Type.assertString(input, "input");
 
   if (isNonEmptyString(pattern) !== true) {
     return input;
@@ -86,7 +79,7 @@ export function trim(input: string, pattern: string): string {
 }
 
 export function trimStart(input: string, pattern: string): string {
-  _assertStringType(input, "input");
+  Type.assertString(input, "input");
 
   if (isNonEmptyString(pattern) !== true) {
     return input;
@@ -95,7 +88,7 @@ export function trimStart(input: string, pattern: string): string {
 }
 
 export function trimEnd(input: string, pattern: string): string {
-  _assertStringType(input, "input");
+  Type.assertString(input, "input");
 
   if (isNonEmptyString(pattern) !== true) {
     return input;
@@ -105,24 +98,24 @@ export function trimEnd(input: string, pattern: string): string {
 
 export function* segment(
   input: string,
-  charCount: SafeInteger,
+  charCount: int,
   paddingChar?: string,
 ): Generator<string, void, void> {
-  _assertStringType(input, "input");
+  Type.assertString(input, "input");
 
-  if (SafeInteger.isPositiveSafeInteger(charCount) !== true) {
+  if (SafeInteger.isPositive(charCount) !== true) {
     throw new TypeError("charCount");
   }
-  if ((isString(paddingChar) !== true) && (paddingChar !== undefined)) {
+  if ((Type.isString(paddingChar) !== true) && (paddingChar !== undefined)) {
     throw new TypeError("paddingChar");
   }
-  if (isString(paddingChar) && (paddingChar.length !== 1)) {
+  if (Type.isString(paddingChar) && (paddingChar.length !== 1)) {
     throw new TypeError("paddingChar must be a code unit");
   }
 
   for (let i = 0; i < input.length; i = i + charCount) {
     const s = input.substring(i, i + charCount);
-    yield ((s.length === charCount) || (isString(paddingChar) !== true))
+    yield ((s.length === charCount) || (Type.isString(paddingChar) !== true))
       ? s
       : s.padEnd(charCount, paddingChar);
   }

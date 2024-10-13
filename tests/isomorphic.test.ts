@@ -83,6 +83,6 @@ Deno.test("Isomorphic.encode", () => {
       Isomorphic.encode(0 as unknown as string);
     },
     TypeError,
-    "input",
+    "`input` must be a `string`.",
   );
 });
