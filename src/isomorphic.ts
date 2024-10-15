@@ -1,4 +1,4 @@
-import { EMPTY } from "./string.ts";
+import { EMPTY } from "./char_sequence.ts";
 import { Type } from "../deps.ts";
 
 /**
