@@ -1,10 +1,24 @@
-import { SafeInteger } from "../deps.ts";
-import { Type } from "../deps.ts";
+import { SafeIntegerType, StringType } from "../deps.ts";
 
+/** Integer. */
 type int = number;
+
+/** 0x0-0x10FFFF */
 type codepoint = number;
+
+/**
+ * String matching regular expression `/^[\u0000-\uFFFF]{1}$/`.
+ * including surrogates.
+ */
 type char = string;
+
+/**
+ * String matching regular expression `/^[\u{0}-\u{10FFFF}]{1}$/u`.
+ * excluding any lone surrogates.
+ */
 type rune = string;
+
+/** A grapheme cluster. */
 type grapheme = string;
 
 /**
@@ -12,12 +26,8 @@ type grapheme = string;
  */
 export const EMPTY = "";
 
-export function isNonEmpty(test: unknown): boolean {
-  return Type.isString(test) && (test.length > 0);
-}
-
 export function* toChars(source: string): Generator<char, void, void> {
-  Type.assertString(source, "source");
+  StringType.assertString(source, "source");
 
   for (let i = 0; i < source.length; i++) {
     yield source.charAt(i);
@@ -25,12 +35,12 @@ export function* toChars(source: string): Generator<char, void, void> {
 }
 
 export function charCountOf(source: string): int {
-  Type.assertString(source, "source");
+  StringType.assertString(source, "source");
   return source.length;
 }
 
 export function* toRunes(source: string): Generator<rune, void, void> {
-  Type.assertString(source, "source");
+  StringType.assertString(source, "source");
 
   for (const rune of [...source]) {
     yield rune;
@@ -38,14 +48,14 @@ export function* toRunes(source: string): Generator<rune, void, void> {
 }
 
 export function runeCountOf(source: string): int {
-  Type.assertString(source, "source");
+  StringType.assertString(source, "source");
   return [...source].length;
 }
 
 export function* toCodePoints(
   source: string,
 ): Generator<codepoint, void, void> {
-  Type.assertString(source, "source");
+  StringType.assertString(source, "source");
 
   for (const rune of [...source]) {
     yield rune.codePointAt(0)!;
@@ -53,12 +63,12 @@ export function* toCodePoints(
 }
 
 export function* toGraphemes(source: string): Generator<grapheme, void, void> {
-  Type.assertString(source, "source");
+  StringType.assertString(source, "source");
 }
 
 export function matches(input: string, pattern: string): boolean {
-  Type.assertString(input, "input");
-  Type.assertString(pattern, "pattern");
+  StringType.assertString(input, "input");
+  StringType.assertString(pattern, "pattern");
 
   if (pattern.length <= 0) {
     return false;
@@ -67,8 +77,8 @@ export function matches(input: string, pattern: string): boolean {
 }
 
 export function contains(input: string, pattern: string): boolean {
-  Type.assertString(input, "input");
-  Type.assertString(pattern, "pattern");
+  StringType.assertString(input, "input");
+  StringType.assertString(pattern, "pattern");
 
   if (pattern.length <= 0) {
     return false;
@@ -77,8 +87,8 @@ export function contains(input: string, pattern: string): boolean {
 }
 
 export function startsWith(input: string, pattern: string): boolean {
-  Type.assertString(input, "input");
-  Type.assertString(pattern, "pattern");
+  StringType.assertString(input, "input");
+  StringType.assertString(pattern, "pattern");
 
   if (pattern.length <= 0) {
     return false;
@@ -87,8 +97,8 @@ export function startsWith(input: string, pattern: string): boolean {
 }
 
 export function endsWith(input: string, pattern: string): boolean {
-  Type.assertString(input, "input");
-  Type.assertString(pattern, "pattern");
+  StringType.assertString(input, "input");
+  StringType.assertString(pattern, "pattern");
 
   if (pattern.length <= 0) {
     return false;
@@ -97,9 +107,9 @@ export function endsWith(input: string, pattern: string): boolean {
 }
 
 export function collectStart(input: string, pattern: string): string {
-  Type.assertString(input, "input");
+  StringType.assertString(input, "input");
 
-  if (isNonEmpty(pattern) !== true) {
+  if (StringType.isNonEmpty(pattern) !== true) {
     return EMPTY;
   }
   const results = (new RegExp(`^${pattern}`, "u")).exec(input);
@@ -110,9 +120,9 @@ export function collectStart(input: string, pattern: string): string {
 }
 
 export function trim(input: string, pattern: string): string {
-  Type.assertString(input, "input");
+  StringType.assertString(input, "input");
 
-  if (isNonEmpty(pattern) !== true) {
+  if (StringType.isNonEmpty(pattern) !== true) {
     return input;
   }
   return input.replace(
@@ -122,18 +132,18 @@ export function trim(input: string, pattern: string): string {
 }
 
 export function trimStart(input: string, pattern: string): string {
-  Type.assertString(input, "input");
+  StringType.assertString(input, "input");
 
-  if (isNonEmpty(pattern) !== true) {
+  if (StringType.isNonEmpty(pattern) !== true) {
     return input;
   }
   return input.replace(new RegExp(`^${pattern}`, "u"), EMPTY);
 }
 
 export function trimEnd(input: string, pattern: string): string {
-  Type.assertString(input, "input");
+  StringType.assertString(input, "input");
 
-  if (isNonEmpty(pattern) !== true) {
+  if (StringType.isNonEmpty(pattern) !== true) {
     return input;
   }
   return input.replace(new RegExp(`${pattern}$`, "u"), EMPTY);
@@ -144,21 +154,24 @@ export function* segmentedChars(
   charCount: int,
   paddingChar?: char,
 ): Generator<string, void, void> {
-  Type.assertString(input, "input");
+  StringType.assertString(input, "input");
 
-  if (SafeInteger.isPositive(charCount) !== true) {
+  if (SafeIntegerType.isPositive(charCount) !== true) {
     throw new TypeError("charCount");
   }
-  if ((Type.isString(paddingChar) !== true) && (paddingChar !== undefined)) {
+  if (
+    (StringType.isString(paddingChar) !== true) && (paddingChar !== undefined)
+  ) {
     throw new TypeError("paddingChar");
   }
-  if (Type.isString(paddingChar) && (paddingChar.length !== 1)) {
+  if (StringType.isString(paddingChar) && (paddingChar.length !== 1)) {
     throw new TypeError("paddingChar must be a code unit");
   }
 
   for (let i = 0; i < input.length; i = i + charCount) {
     const s = input.substring(i, i + charCount);
-    yield ((s.length === charCount) || (Type.isString(paddingChar) !== true))
+    yield ((s.length === charCount) ||
+        (StringType.isString(paddingChar) !== true))
       ? s
       : s.padEnd(charCount, paddingChar);
   }

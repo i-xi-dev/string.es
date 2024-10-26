@@ -1,5 +1,5 @@
 import { EMPTY } from "./char_sequence.ts";
-import { Type } from "../deps.ts";
+import { StringType } from "../deps.ts";
 
 /**
  * Isomorphic encoding
@@ -42,7 +42,7 @@ export namespace Isomorphic {
    * @returns A byte sequence of isomorphic encoded `input`.
    */
   export function encode(input = EMPTY): Uint8Array {
-    Type.assertString(input, "input");
+    StringType.assertString(input, "input");
 
     // deno-lint-ignore no-control-regex
     if (/^[\u{0}-\u{FF}]*$/u.test(input) !== true) {
