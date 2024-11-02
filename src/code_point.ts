@@ -1,9 +1,7 @@
 import { Numerics, SafeIntegerType } from "../deps.ts";
+import { Plane } from "./plane.ts";
 
 type codepoint = number;
-
-// 0～16 0はBMP
-type plane = number;
 
 export const MIN_VALUE = 0x0;
 
@@ -45,27 +43,24 @@ export function toString(codePoint: codepoint): string {
   return `U+${SafeIntegerType.toString(codePoint, _toStringOptions)}`;
 }
 
-export function planeOf(codePoint: codepoint): plane {
+export function planeOf(codePoint: codepoint): Plane {
   assertCodePoint(codePoint);
-  return Math.trunc(codePoint / 0x10000) as plane;
+  return Math.trunc(codePoint / 0x10000) as Plane;
 }
 
-export function isBmp(test: codepoint): test is codepoint {
-  //return (planeOf(test) === _BMP);
-
-  assertCodePoint(test);
-  return (test < 0x10000);
+export function isBmp(test: unknown): test is codepoint {
+  return isInRange(test, 0, 0x10000);
 }
 
-export function isHighSurrogate(test: codepoint): test is codepoint {
+export function isHighSurrogate(test: unknown): test is codepoint {
   return isInRange(test, _MIN_HIGH_SURROGATE, _MAX_HIGH_SURROGATE);
 }
 
-export function isLowSurrogate(test: codepoint): test is codepoint {
+export function isLowSurrogate(test: unknown): test is codepoint {
   return isInRange(test, _MIN_LOW_SURROGATE, _MAX_LOW_SURROGATE);
 }
 
-export function isSurrogate(test: codepoint): test is codepoint {
+export function isSurrogate(test: unknown): test is codepoint {
   return isInRange(test, _MIN_HIGH_SURROGATE, _MAX_LOW_SURROGATE);
 }
 
