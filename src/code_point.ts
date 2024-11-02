@@ -25,8 +25,13 @@ export const MIN_VALUE = 0x0;
 
 export const MAX_VALUE = 0x10FFFF;
 
-const _HIGH_SURROGATE_RANGE: IntegerRange.Tuple<codepoint> = [0xD800, 0xDBFF];
-const _LOW_SURROGATE_RANGE: IntegerRange.Tuple<codepoint> = [0xDC00, 0xDFFF];
+const _Range = {
+  HIGH_SURROGATE: [0xD800, 0xDBFF] as IntegerRange.Tuple<codepoint>,
+  LOW_SURROGATE: [0xDC00, 0xDFFF] as IntegerRange.Tuple<codepoint>,
+  VS: [0xFE00, 0xFE0F] as IntegerRange.Tuple<codepoint>,
+  VSS: [0xE0100, 0xE01EF] as IntegerRange.Tuple<codepoint>,
+  MONGOLIAN_VS: [0x180B, 0x180F] as IntegerRange.Tuple<codepoint>,
+} as const;
 
 export function isCodePoint(test: unknown): test is codepoint {
   return SafeIntegerType.isInRange(test, MIN_VALUE, MAX_VALUE);
@@ -98,19 +103,19 @@ export function isBmp(codePoint: codepoint): codePoint is codepoint {
 }
 
 export function isHighSurrogate(codePoint: codepoint): codePoint is codepoint {
-  return isInRange(codePoint, _HIGH_SURROGATE_RANGE);
+  return isInRange(codePoint, _Range.HIGH_SURROGATE);
 }
 
 export function isLowSurrogate(codePoint: codepoint): codePoint is codepoint {
-  return isInRange(codePoint, _LOW_SURROGATE_RANGE);
+  return isInRange(codePoint, _Range.LOW_SURROGATE);
 }
 
 export function isSurrogate(codePoint: codepoint): codePoint is codepoint {
-  return isInRanges(codePoint, [_HIGH_SURROGATE_RANGE, _LOW_SURROGATE_RANGE]);
+  return isInRanges(codePoint, [_Range.HIGH_SURROGATE, _Range.LOW_SURROGATE]);
 }
 
-//TODO
-// export function isVariationSelector(codePoint: codepoint): boolean {
-//   assertCodePoint(codePoint);
-//   return inRanges(codePoint, _VSS, _checked);
-// }
+export function isVariationSelector(
+  codePoint: codepoint,
+): codePoint is codepoint {
+  return isInRanges(codePoint, [_Range.VS, _Range.VSS, _Range.MONGOLIAN_VS]);
+}
