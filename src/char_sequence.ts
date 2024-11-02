@@ -62,9 +62,10 @@ export function* toCodePoints(
   }
 }
 
-export function* toGraphemes(source: string): Generator<grapheme, void, void> {
-  StringType.assertString(source, "source");
-}
+// export function* toGraphemes(source: string): Generator<grapheme, void, void> {
+//   StringType.assertString(source, "source");
+//   //TODO
+// }
 
 export function matches(input: string, pattern: string): boolean {
   StringType.assertString(input, "input");

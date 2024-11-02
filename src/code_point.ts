@@ -1,3 +1,5 @@
+import { Numerics, SafeIntegerType } from "../deps.ts";
+
 type codepoint = number;
 
 // 0～16 0はBMP
@@ -13,52 +15,62 @@ const _MIN_LOW_SURROGATE = 0xDC00;
 const _MAX_LOW_SURROGATE = 0xDFFF;
 
 export function isCodePoint(test: unknown): test is codepoint {
-  return Number.isSafeInteger(test) && ((test as number) >= MIN_VALUE) &&
-    ((test as number) <= MAX_VALUE);
+  return SafeIntegerType.isInRange(test, MIN_VALUE, MAX_VALUE);
 }
 
-function _assertCodePoint(codePoint: unknown): void {
+export function assertCodePoint(codePoint: unknown): void {
   if (isCodePoint(codePoint) !== true) {
     throw new TypeError("`codePoint` must be a code point.");
   }
 }
 
+export function isInRange(
+  test: unknown,
+  min: codepoint,
+  max: codepoint,
+): test is codepoint {
+  assertCodePoint(min);
+  assertCodePoint(max);
+
+  return isCodePoint(test) && (min <= test) && (max >= test);
+}
+
+const _toStringOptions = {
+  minIntegralDigits: 4,
+  radix: Numerics.Radix.HEXADECIMAL,
+} as const;
+
 export function toString(codePoint: codepoint): string {
-  _assertCodePoint(codePoint);
-  return `U+${codePoint.toString(16).toUpperCase().padStart(4, "0")}`;
+  assertCodePoint(codePoint);
+  return `U+${SafeIntegerType.toString(codePoint, _toStringOptions)}`;
 }
 
 export function planeOf(codePoint: codepoint): plane {
-  _assertCodePoint(codePoint);
+  assertCodePoint(codePoint);
   return Math.trunc(codePoint / 0x10000) as plane;
 }
 
-export function isBmp(codePoint: codepoint): boolean {
-  //return (planeOf(codePoint) === _BMP);
+export function isBmp(test: codepoint): test is codepoint {
+  //return (planeOf(test) === _BMP);
 
-  _assertCodePoint(codePoint);
-  return (codePoint < 0x10000);
+  assertCodePoint(test);
+  return (test < 0x10000);
 }
 
-export function isHighSurrogate(codePoint: codepoint): boolean {
-  _assertCodePoint(codePoint);
-  return (codePoint >= _MIN_HIGH_SURROGATE) &&
-    (codePoint <= _MAX_HIGH_SURROGATE);
+export function isHighSurrogate(test: codepoint): test is codepoint {
+  return isInRange(test, _MIN_HIGH_SURROGATE, _MAX_HIGH_SURROGATE);
 }
 
-export function isLowSurrogate(codePoint: codepoint): boolean {
-  _assertCodePoint(codePoint);
-  return (codePoint >= _MIN_LOW_SURROGATE) && (codePoint <= _MAX_LOW_SURROGATE);
+export function isLowSurrogate(test: codepoint): test is codepoint {
+  return isInRange(test, _MIN_LOW_SURROGATE, _MAX_LOW_SURROGATE);
 }
 
-export function isSurrogate(codePoint: codepoint): boolean {
-  _assertCodePoint(codePoint);
-  return (codePoint >= _MIN_HIGH_SURROGATE) &&
-    (codePoint <= _MAX_LOW_SURROGATE);
+export function isSurrogate(test: codepoint): test is codepoint {
+  return isInRange(test, _MIN_HIGH_SURROGATE, _MAX_LOW_SURROGATE);
 }
 
 //TODO
 // export function isVariationSelector(codePoint: codepoint): boolean {
-//   _assertCodePoint(codePoint);
+//   assertCodePoint(codePoint);
 //   return inRanges(codePoint, _VSS, _checked);
 // }

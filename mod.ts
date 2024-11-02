@@ -1,2 +1,2 @@
 export * from "./src/isomorphic.ts";
-export * as StringEx from "./src/string.ts";
+export * as CharSequence from "./src/char_sequence.ts";
