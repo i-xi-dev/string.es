@@ -39,24 +39,31 @@ export function charCountOf(source: string): int {
   return source.length;
 }
 
-export function* toRunes(source: string): Generator<rune, void, void> {
-  StringType.assertString(source, "source");
+function _assertUsvString(test: unknown, label: string): void {
+  if ((StringType.isString(test) && test.isWellFormed()) !== true) {
+    throw new TypeError(`\`${label}\` must be an USVString.`);
+  }
+}
 
+//XXX オプションでallowMalformed
+export function* toRunes(source: string): Generator<rune, void, void> {
+  _assertUsvString(source, "source");
   for (const rune of [...source]) {
     yield rune;
   }
 }
 
+//XXX オプションでallowMalformed
 export function runeCountOf(source: string): int {
-  StringType.assertString(source, "source");
+  _assertUsvString(source, "source");
   return [...source].length;
 }
 
+//XXX オプションでallowMalformed
 export function* toCodePoints(
   source: string,
 ): Generator<codepoint, void, void> {
-  StringType.assertString(source, "source");
-
+  _assertUsvString(source, "source");
   for (const rune of [...source]) {
     yield rune.codePointAt(0)!;
   }
