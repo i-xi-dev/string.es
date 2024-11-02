@@ -2,7 +2,7 @@ import { IntegerRange, Numerics, SafeIntegerType } from "../deps.ts";
 
 type codepoint = number;
 
-export type Plane =
+type plane =
   | 0
   | 1
   | 2
@@ -21,17 +21,23 @@ export type Plane =
   | 15
   | 16;
 
+const _BMP: plane = 0;
+const _SPUA_B: plane = 16;
+
 export const MIN_VALUE = 0x0;
 
 export const MAX_VALUE = 0x10FFFF;
 
-const _Range = {
-  HIGH_SURROGATE: [0xD800, 0xDBFF] as IntegerRange.Tuple<codepoint>,
-  LOW_SURROGATE: [0xDC00, 0xDFFF] as IntegerRange.Tuple<codepoint>,
-  VS: [0xFE00, 0xFE0F] as IntegerRange.Tuple<codepoint>,
-  VSS: [0xE0100, 0xE01EF] as IntegerRange.Tuple<codepoint>,
-  MONGOLIAN_VS: [0x180B, 0x180F] as IntegerRange.Tuple<codepoint>,
-} as const;
+const _MIN_HIGH_SURROGATE = 0xD800;
+const _MAX_HIGH_SURROGATE = 0xDBFF;
+const _MIN_LOW_SURROGATE = 0xDC00;
+const _MAX_LOW_SURROGATE = 0xDFFF;
+const _MIN_VS = 0xFE00;
+const _MAX_VS = 0xFE0F;
+const _MIN_VSS = 0xE0100;
+const _MAX_VSS = 0xE01EF;
+const _MIN_MONGOLIAN_VS = 0x180B;
+const _MAX_MONGOLIAN_VS = 0x180F;
 
 export function isCodePoint(test: unknown): test is codepoint {
   return SafeIntegerType.isInRange(test, MIN_VALUE, MAX_VALUE);
@@ -54,23 +60,27 @@ function _isInRange(
   return isCodePoint(codePoint) && (min <= codePoint) && (max >= codePoint);
 }
 
-export function isInRange(
-  codePoint: codepoint,
-  range: IntegerRange.Like<codepoint>,
-): codePoint is codepoint {
-  const { min, max } = IntegerRange.Struct.fromRangeLike(range);
-  return _isInRange(codePoint, min, max);
-}
-
 export function isInRanges(
   codePoint: codepoint,
   ranges: IntegerRange.Like<codepoint>[],
 ): codePoint is codepoint {
   if (Array.isArray(ranges) !== true) {
-    throw new Error("TODO");
+    throw new TypeError("`ranges` must be a array of code point range.");
+    // rangesの各要素についてはisInRangeでチェックされるのでここではチェックしない
   }
 
-  return ranges.some((range) => isInRange(codePoint, range));
+  let parsedRanges;
+  try {
+    parsedRanges = ranges.map((range) =>
+      IntegerRange.Struct.fromRangeLike(range)
+    );
+  } catch {
+    throw new TypeError("`range` must be a code point range.");
+  }
+
+  return parsedRanges.some((range) =>
+    _isInRange(codePoint, range.min, range.max)
+  );
 }
 
 const _toStringOptions = {
@@ -83,39 +93,47 @@ export function toString(codePoint: codepoint): string {
   return `U+${SafeIntegerType.toString(codePoint, _toStringOptions)}`;
 }
 
-export function planeOf(codePoint: codepoint): Plane {
+export function planeOf(codePoint: codepoint): plane {
   assertCodePoint(codePoint);
-  return Math.trunc(codePoint / 0x10000) as Plane;
+  return Math.trunc(codePoint / 0x10000) as plane;
 }
 
 export function isInPlanes(
   codePoint: codepoint,
-  planes: Plane[],
+  planes: plane[],
 ): codePoint is codepoint {
-  //TODO planes is Plane[]
+  if (
+    (Array.isArray(planes) &&
+      planes.every((plane) =>
+        SafeIntegerType.isInRange(plane, _BMP, _SPUA_B)
+      )) !== true
+  ) {
+    throw new TypeError("`planes` must be a array of planes.");
+  }
 
-  const plane = planeOf(codePoint);
-  return Array.isArray(planes) && planes.includes(plane);
+  return planes.includes(planeOf(codePoint));
 }
 
 export function isBmp(codePoint: codepoint): codePoint is codepoint {
-  return isInRange(codePoint, [0, 0x10000]);
+  return _isInRange(codePoint, MIN_VALUE, 0xFFFF);
 }
 
 export function isHighSurrogate(codePoint: codepoint): codePoint is codepoint {
-  return isInRange(codePoint, _Range.HIGH_SURROGATE);
+  return _isInRange(codePoint, _MIN_HIGH_SURROGATE, _MAX_HIGH_SURROGATE);
 }
 
 export function isLowSurrogate(codePoint: codepoint): codePoint is codepoint {
-  return isInRange(codePoint, _Range.LOW_SURROGATE);
+  return _isInRange(codePoint, _MIN_LOW_SURROGATE, _MAX_LOW_SURROGATE);
 }
 
 export function isSurrogate(codePoint: codepoint): codePoint is codepoint {
-  return isInRanges(codePoint, [_Range.HIGH_SURROGATE, _Range.LOW_SURROGATE]);
+  return _isInRange(codePoint, _MIN_HIGH_SURROGATE, _MAX_LOW_SURROGATE);
 }
 
 export function isVariationSelector(
   codePoint: codepoint,
 ): codePoint is codepoint {
-  return isInRanges(codePoint, [_Range.VS, _Range.VSS, _Range.MONGOLIAN_VS]);
+  return _isInRange(codePoint, _MIN_VS, _MAX_VS) ||
+    _isInRange(codePoint, _MIN_VSS, _MAX_VSS) ||
+    _isInRange(codePoint, _MIN_MONGOLIAN_VS, _MAX_MONGOLIAN_VS);
 }
