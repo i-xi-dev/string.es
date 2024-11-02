@@ -1,4 +1,4 @@
-import { Numerics, ObjectType, SafeIntegerType } from "../deps.ts";
+import { IntegerRange, Numerics, SafeIntegerType } from "../deps.ts";
 
 type codepoint = number;
 
@@ -25,10 +25,8 @@ export const MIN_VALUE = 0x0;
 
 export const MAX_VALUE = 0x10FFFF;
 
-const _MIN_HIGH_SURROGATE = 0xD800;
-const _MAX_HIGH_SURROGATE = 0xDBFF;
-const _MIN_LOW_SURROGATE = 0xDC00;
-const _MAX_LOW_SURROGATE = 0xDFFF;
+const _HIGH_SURROGATE_RANGE: IntegerRange.Tuple<codepoint> = [0xD800, 0xDBFF];
+const _LOW_SURROGATE_RANGE: IntegerRange.Tuple<codepoint> = [0xDC00, 0xDFFF];
 
 export function isCodePoint(test: unknown): test is codepoint {
   return SafeIntegerType.isInRange(test, MIN_VALUE, MAX_VALUE);
@@ -40,15 +38,34 @@ export function assertCodePoint(codePoint: unknown): void {
   }
 }
 
-export function isInRange(
-  test: unknown,
+function _isInRange(
+  codePoint: codepoint,
   min: codepoint,
   max: codepoint,
-): test is codepoint {
+): codePoint is codepoint {
   assertCodePoint(min);
   assertCodePoint(max);
 
-  return isCodePoint(test) && (min <= test) && (max >= test);
+  return isCodePoint(codePoint) && (min <= codePoint) && (max >= codePoint);
+}
+
+export function isInRange(
+  codePoint: codepoint,
+  range: IntegerRange.Like<codepoint>,
+): codePoint is codepoint {
+  const { min, max } = IntegerRange.Struct.fromRangeLike(range);
+  return _isInRange(codePoint, min, max);
+}
+
+export function isInRanges(
+  codePoint: codepoint,
+  ranges: IntegerRange.Like<codepoint>[],
+): codePoint is codepoint {
+  if (Array.isArray(ranges) !== true) {
+    throw new Error("TODO");
+  }
+
+  return ranges.some((range) => isInRange(codePoint, range));
 }
 
 const _toStringOptions = {
@@ -70,24 +87,26 @@ export function isInPlanes(
   codePoint: codepoint,
   planes: Plane[],
 ): codePoint is codepoint {
+  //TODO planes is Plane[]
+
   const plane = planeOf(codePoint);
   return Array.isArray(planes) && planes.includes(plane);
 }
 
 export function isBmp(codePoint: codepoint): codePoint is codepoint {
-  return isInRange(codePoint, 0, 0x10000);
+  return isInRange(codePoint, [0, 0x10000]);
 }
 
 export function isHighSurrogate(codePoint: codepoint): codePoint is codepoint {
-  return isInRange(codePoint, _MIN_HIGH_SURROGATE, _MAX_HIGH_SURROGATE);
+  return isInRange(codePoint, _HIGH_SURROGATE_RANGE);
 }
 
 export function isLowSurrogate(codePoint: codepoint): codePoint is codepoint {
-  return isInRange(codePoint, _MIN_LOW_SURROGATE, _MAX_LOW_SURROGATE);
+  return isInRange(codePoint, _LOW_SURROGATE_RANGE);
 }
 
 export function isSurrogate(codePoint: codepoint): codePoint is codepoint {
-  return isInRange(codePoint, _MIN_HIGH_SURROGATE, _MAX_LOW_SURROGATE);
+  return isInRanges(codePoint, [_HIGH_SURROGATE_RANGE, _LOW_SURROGATE_RANGE]);
 }
 
 //TODO
