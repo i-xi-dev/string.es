@@ -1,7 +1,25 @@
-import { Numerics, SafeIntegerType } from "../deps.ts";
-import { Plane } from "./plane.ts";
+import { Numerics, ObjectType, SafeIntegerType } from "../deps.ts";
 
 type codepoint = number;
+
+export type Plane =
+  | 0
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9
+  | 10
+  | 11
+  | 12
+  | 13
+  | 14
+  | 15
+  | 16;
 
 export const MIN_VALUE = 0x0;
 
@@ -48,20 +66,28 @@ export function planeOf(codePoint: codepoint): Plane {
   return Math.trunc(codePoint / 0x10000) as Plane;
 }
 
-export function isBmp(test: unknown): test is codepoint {
-  return isInRange(test, 0, 0x10000);
+export function isInPlanes(
+  codePoint: codepoint,
+  planes: Plane[],
+): codePoint is codepoint {
+  const plane = planeOf(codePoint);
+  return Array.isArray(planes) && planes.includes(plane);
 }
 
-export function isHighSurrogate(test: unknown): test is codepoint {
-  return isInRange(test, _MIN_HIGH_SURROGATE, _MAX_HIGH_SURROGATE);
+export function isBmp(codePoint: codepoint): codePoint is codepoint {
+  return isInRange(codePoint, 0, 0x10000);
 }
 
-export function isLowSurrogate(test: unknown): test is codepoint {
-  return isInRange(test, _MIN_LOW_SURROGATE, _MAX_LOW_SURROGATE);
+export function isHighSurrogate(codePoint: codepoint): codePoint is codepoint {
+  return isInRange(codePoint, _MIN_HIGH_SURROGATE, _MAX_HIGH_SURROGATE);
 }
 
-export function isSurrogate(test: unknown): test is codepoint {
-  return isInRange(test, _MIN_HIGH_SURROGATE, _MAX_LOW_SURROGATE);
+export function isLowSurrogate(codePoint: codepoint): codePoint is codepoint {
+  return isInRange(codePoint, _MIN_LOW_SURROGATE, _MAX_LOW_SURROGATE);
+}
+
+export function isSurrogate(codePoint: codepoint): codePoint is codepoint {
+  return isInRange(codePoint, _MIN_HIGH_SURROGATE, _MAX_LOW_SURROGATE);
 }
 
 //TODO
