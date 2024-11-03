@@ -115,34 +115,27 @@ export function toGraphemes(
 }
 
 export function matches(test: string, pattern: string): test is string {
-  return StringType.isString(test) && StringType.isNonEmpty(pattern) &&
+  return StringType.isString(test) && StringType.isString(pattern) &&
     (new RegExp(`^${pattern}$`, "u")).test(test);
 }
 
 export function contains(test: string, pattern: string): test is string {
-  return StringType.isString(test) && StringType.isNonEmpty(pattern) &&
+  return StringType.isString(test) && StringType.isString(pattern) &&
     (new RegExp(`${pattern}`, "u")).test(test);
 }
 
-export function startsWith(input: string, pattern: string): boolean {
-  StringType.assertString(input, "input");
-  StringType.assertString(pattern, "pattern");
-
-  if (pattern.length <= 0) {
-    return false;
-  }
-  return (new RegExp(`^${pattern}`, "u")).test(input);
+export function startsWith(test: string, pattern: string): test is string {
+  return StringType.isString(test) && StringType.isString(pattern) &&
+    (new RegExp(`^${pattern}`, "u")).test(test);
 }
 
-export function endsWith(input: string, pattern: string): boolean {
-  StringType.assertString(input, "input");
-  StringType.assertString(pattern, "pattern");
-
-  if (pattern.length <= 0) {
-    return false;
-  }
-  return (new RegExp(`${pattern}$`, "u")).test(input);
+export function endsWith(test: string, pattern: string): test is string {
+  return StringType.isString(test) && StringType.isString(pattern) &&
+    (new RegExp(`${pattern}$`, "u")).test(test);
 }
+
+//
+
 
 export function collectStart(input: string, pattern: string): string {
   StringType.assertString(input, "input");
