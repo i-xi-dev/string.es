@@ -223,3 +223,63 @@ Deno.test("CharSequence.toGraphemes()", () => {
     `["\u{29E3D}","\u304C","\u585A\u{E0101}"]`,
   );
 });
+
+const HTTP_TAB_OR_SPACE = "[\\u{9}\\u{20}]+";
+
+Deno.test("CharSequence.matches()", () => {
+  assertStrictEquals(CharSequence.matches("", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(CharSequence.matches("\u0008", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(CharSequence.matches("\t", HTTP_TAB_OR_SPACE), true);
+  assertStrictEquals(CharSequence.matches("\u000A", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(CharSequence.matches("\u001F", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(CharSequence.matches(" ", HTTP_TAB_OR_SPACE), true);
+  assertStrictEquals(CharSequence.matches("\u0021", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(CharSequence.matches("a", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(
+    CharSequence.matches("\t      \t    ", HTTP_TAB_OR_SPACE),
+    true,
+  );
+  assertStrictEquals(CharSequence.matches("az", "[\\u{41}\\u{5A}]+"), false);
+  assertStrictEquals(CharSequence.matches("AZ", "[\\u{41}\\u{5A}]+"), true);
+  assertStrictEquals(CharSequence.matches("azAZ", "[\\u{41}\\u{5A}]+"), false);
+
+  assertStrictEquals(
+    CharSequence.matches(undefined as unknown as string, HTTP_TAB_OR_SPACE),
+    false,
+  );
+  assertStrictEquals(
+    CharSequence.matches("", undefined as unknown as string),
+    false,
+  );
+});
+
+Deno.test("CharSequence.contains()", () => {
+  assertStrictEquals(CharSequence.contains("", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(CharSequence.contains("\u0008", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(CharSequence.contains("\t", HTTP_TAB_OR_SPACE), true);
+  assertStrictEquals(CharSequence.contains("\u000A", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(CharSequence.contains("\u001F", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(CharSequence.contains(" ", HTTP_TAB_OR_SPACE), true);
+  assertStrictEquals(CharSequence.contains("\u0021", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(CharSequence.contains("a", HTTP_TAB_OR_SPACE), false);
+  assertStrictEquals(
+    CharSequence.contains("\t      \t    ", HTTP_TAB_OR_SPACE),
+    true,
+  );
+  assertStrictEquals(CharSequence.contains("az", "[\\u{41}\\u{5A}]+"), false);
+  assertStrictEquals(CharSequence.contains("AZ", "[\\u{41}\\u{5A}]+"), true);
+  assertStrictEquals(CharSequence.contains("azAZ", "[\\u{41}\\u{5A}]+"), true);
+
+  assertStrictEquals(CharSequence.contains("x x", HTTP_TAB_OR_SPACE), true);
+  assertStrictEquals(CharSequence.contains(" x", HTTP_TAB_OR_SPACE), true);
+  assertStrictEquals(CharSequence.contains("x ", HTTP_TAB_OR_SPACE), true);
+
+  assertStrictEquals(
+    CharSequence.contains(undefined as unknown as string, HTTP_TAB_OR_SPACE),
+    false,
+  );
+  assertStrictEquals(
+    CharSequence.contains("", undefined as unknown as string),
+    false,
+  );
+});
