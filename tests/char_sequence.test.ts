@@ -127,11 +127,46 @@ Deno.test("CharSequence.runeCountOf()", () => {
   );
 });
 
+Deno.test("CharSequence.fromCodePoints()", () => {
+  assertStrictEquals(CharSequence.fromCodePoints([]), "");
+  assertStrictEquals(CharSequence.fromCodePoints([48, 49, 50]), "012");
+  assertStrictEquals(CharSequence.fromCodePoints([12354, 12356]), "あい");
+  assertStrictEquals(CharSequence.fromCodePoints([131083]), "\u{2000B}");
+
+  assertStrictEquals(
+    CharSequence.fromCodePoints([48, 49, 50, 131083, 12354, 12356]),
+    "012\u{2000B}あい",
+  );
+
+  const e1 = "`source` must implement `Symbol.iterator`.";
+  assertThrows(
+    () => {
+      [...CharSequence.fromCodePoints(1 as unknown as number[])];
+    },
+    TypeError,
+    e1,
+  );
+
+  const e2 = "`codePoint` must be a code point.";
+  assertThrows(
+    () => {
+      [...CharSequence.fromCodePoints([48, -1])];
+    },
+    TypeError,
+    e2,
+  );
+});
+
 Deno.test("CharSequence.toCodePoints()", () => {
   assertStrictEquals(_iToS(CharSequence.toCodePoints("")), `[]`);
   assertStrictEquals(_iToS(CharSequence.toCodePoints("012")), `[48,49,50]`);
   assertStrictEquals(_iToS(CharSequence.toCodePoints("あい")), `[12354,12356]`);
   assertStrictEquals(_iToS(CharSequence.toCodePoints("\u{2000B}")), `[131083]`); // JSONの仕様ではサロゲートペアをエスケープするだったような
+
+  assertStrictEquals(
+    _iToS(CharSequence.toCodePoints("012\u{2000B}あい")),
+    `[48,49,50,131083,12354,12356]`,
+  );
 
   const e1 = "`source` must be an USVString.";
   assertThrows(

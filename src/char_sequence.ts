@@ -67,9 +67,7 @@ export function runeCountOf(source: string): int {
 
 //XXX オプションでallowMalformed
 export function fromCodePoints(source: Iterable<codepoint>): string {
-  if (ObjectType.isIterable(source) !== true) {
-    throw new TypeError("TODO");
-  }
+  ObjectType.assertIterable(source, "source");
 
   let runes = EMPTY;
   let rune: string;
