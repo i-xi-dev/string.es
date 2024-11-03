@@ -97,6 +97,7 @@ function _getGraphemeSegmenter(locale: string | Intl.Locale): Intl.Segmenter {
   return segmenter;
 }
 
+// 分割はIntl.Segmenterに依存する（実行環境によって結果が異なる可能性は排除できない）
 //XXX オプションでallowMalformed
 export function toGraphemes(
   source: string,
@@ -134,15 +135,10 @@ export function endsWith(test: string, pattern: string): test is string {
     (new RegExp(`${pattern}$`, "u")).test(test);
 }
 
-//
-
-
 export function collectStart(input: string, pattern: string): string {
   StringType.assertString(input, "input");
+  StringType.assertString(pattern, "pattern");
 
-  if (StringType.isNonEmpty(pattern) !== true) {
-    return EMPTY;
-  }
   const results = (new RegExp(`^${pattern}`, "u")).exec(input);
   if (results === null) {
     return EMPTY;
@@ -152,6 +148,7 @@ export function collectStart(input: string, pattern: string): string {
 
 export function trim(input: string, pattern: string): string {
   StringType.assertString(input, "input");
+  StringType.assertString(pattern, "pattern");
 
   if (StringType.isNonEmpty(pattern) !== true) {
     return input;
@@ -164,6 +161,7 @@ export function trim(input: string, pattern: string): string {
 
 export function trimStart(input: string, pattern: string): string {
   StringType.assertString(input, "input");
+  StringType.assertString(pattern, "pattern");
 
   if (StringType.isNonEmpty(pattern) !== true) {
     return input;
@@ -173,12 +171,15 @@ export function trimStart(input: string, pattern: string): string {
 
 export function trimEnd(input: string, pattern: string): string {
   StringType.assertString(input, "input");
+  StringType.assertString(pattern, "pattern");
 
   if (StringType.isNonEmpty(pattern) !== true) {
     return input;
   }
   return input.replace(new RegExp(`${pattern}$`, "u"), EMPTY);
 }
+
+//
 
 export function* segmentedChars(
   input: string,

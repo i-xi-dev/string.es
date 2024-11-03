@@ -368,3 +368,232 @@ Deno.test("CharSequence.endsWith()", () => {
   assertStrictEquals(CharSequence.endsWith("", ""), true);
   assertStrictEquals(CharSequence.endsWith("0", ""), true);
 });
+
+Deno.test("CharSequence.collectStart()", () => {
+  assertStrictEquals(CharSequence.collectStart("", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(
+    CharSequence.collectStart("\u0008", HTTP_TAB_OR_SPACE),
+    "",
+  );
+  assertStrictEquals(CharSequence.collectStart("\t", HTTP_TAB_OR_SPACE), "\t");
+  assertStrictEquals(
+    CharSequence.collectStart("\u000A", HTTP_TAB_OR_SPACE),
+    "",
+  );
+  assertStrictEquals(
+    CharSequence.collectStart("\u001F", HTTP_TAB_OR_SPACE),
+    "",
+  );
+  assertStrictEquals(CharSequence.collectStart(" ", HTTP_TAB_OR_SPACE), " ");
+  assertStrictEquals(
+    CharSequence.collectStart("\u0021", HTTP_TAB_OR_SPACE),
+    "",
+  );
+  assertStrictEquals(CharSequence.collectStart("a", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(
+    CharSequence.collectStart("\t      \t    ", HTTP_TAB_OR_SPACE),
+    "\t      \t    ",
+  );
+  assertStrictEquals(CharSequence.collectStart("az", "[\\u{41}\\u{5A}]+"), "");
+  assertStrictEquals(
+    CharSequence.collectStart("AZ", "[\\u{41}\\u{5A}]+"),
+    "AZ",
+  );
+  assertStrictEquals(
+    CharSequence.collectStart("azAZ", "[\\u{41}\\u{5A}]+"),
+    "",
+  );
+
+  assertStrictEquals(CharSequence.collectStart("x x", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(CharSequence.collectStart(" x", HTTP_TAB_OR_SPACE), " ");
+  assertStrictEquals(CharSequence.collectStart("x ", HTTP_TAB_OR_SPACE), "");
+
+  const e1 = "`input` must be a `string`.";
+  assertThrows(
+    () => {
+      [...CharSequence.collectStart(
+        undefined as unknown as string,
+        HTTP_TAB_OR_SPACE,
+      )];
+    },
+    TypeError,
+    e1,
+  );
+
+  const e2 = "`pattern` must be a `string`.";
+  assertThrows(
+    () => {
+      [...CharSequence.collectStart("", undefined as unknown as string)];
+    },
+    TypeError,
+    e2,
+  );
+
+  assertStrictEquals(CharSequence.collectStart("", ""), "");
+  assertStrictEquals(CharSequence.collectStart("0", ""), "");
+});
+
+Deno.test("CharSequence.trim()", () => {
+  assertStrictEquals(CharSequence.trim("", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(CharSequence.trim("\u0008", HTTP_TAB_OR_SPACE), "\u0008");
+  assertStrictEquals(CharSequence.trim("\t", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(CharSequence.trim("\u000A", HTTP_TAB_OR_SPACE), "\u000A");
+  assertStrictEquals(CharSequence.trim("\u001F", HTTP_TAB_OR_SPACE), "\u001F");
+  assertStrictEquals(CharSequence.trim(" ", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(CharSequence.trim("\u0021", HTTP_TAB_OR_SPACE), "\u0021");
+  assertStrictEquals(CharSequence.trim("a", HTTP_TAB_OR_SPACE), "a");
+  assertStrictEquals(
+    CharSequence.trim("\t      \t    ", HTTP_TAB_OR_SPACE),
+    "",
+  );
+  assertStrictEquals(CharSequence.trim("az", "[\\u{41}\\u{5A}]+"), "az");
+  assertStrictEquals(CharSequence.trim("AZ", "[\\u{41}\\u{5A}]+"), "");
+  assertStrictEquals(CharSequence.trim("azAZ", "[\\u{41}\\u{5A}]+"), "az");
+
+  assertStrictEquals(CharSequence.trim("x x", HTTP_TAB_OR_SPACE), "x x");
+  assertStrictEquals(CharSequence.trim(" x", HTTP_TAB_OR_SPACE), "x");
+  assertStrictEquals(CharSequence.trim("x ", HTTP_TAB_OR_SPACE), "x");
+
+  const e1 = "`input` must be a `string`.";
+  assertThrows(
+    () => {
+      [...CharSequence.trim(
+        undefined as unknown as string,
+        HTTP_TAB_OR_SPACE,
+      )];
+    },
+    TypeError,
+    e1,
+  );
+
+  const e2 = "`pattern` must be a `string`.";
+  assertThrows(
+    () => {
+      [...CharSequence.trim("", undefined as unknown as string)];
+    },
+    TypeError,
+    e2,
+  );
+
+  assertStrictEquals(CharSequence.trim("", ""), "");
+  assertStrictEquals(CharSequence.trim("0", ""), "0");
+});
+
+Deno.test("CharSequence.trimStart()", () => {
+  assertStrictEquals(CharSequence.trimStart("", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(
+    CharSequence.trimStart("\u0008", HTTP_TAB_OR_SPACE),
+    "\u0008",
+  );
+  assertStrictEquals(CharSequence.trimStart("\t", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(
+    CharSequence.trimStart("\u000A", HTTP_TAB_OR_SPACE),
+    "\u000A",
+  );
+  assertStrictEquals(
+    CharSequence.trimStart("\u001F", HTTP_TAB_OR_SPACE),
+    "\u001F",
+  );
+  assertStrictEquals(CharSequence.trimStart(" ", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(
+    CharSequence.trimStart("\u0021", HTTP_TAB_OR_SPACE),
+    "\u0021",
+  );
+  assertStrictEquals(CharSequence.trimStart("a", HTTP_TAB_OR_SPACE), "a");
+  assertStrictEquals(
+    CharSequence.trimStart("\t      \t    ", HTTP_TAB_OR_SPACE),
+    "",
+  );
+  assertStrictEquals(CharSequence.trimStart("az", "[\\u{41}\\u{5A}]+"), "az");
+  assertStrictEquals(CharSequence.trimStart("AZ", "[\\u{41}\\u{5A}]+"), "");
+  assertStrictEquals(
+    CharSequence.trimStart("azAZ", "[\\u{41}\\u{5A}]+"),
+    "azAZ",
+  );
+
+  assertStrictEquals(CharSequence.trimStart("x x", HTTP_TAB_OR_SPACE), "x x");
+  assertStrictEquals(CharSequence.trimStart(" x", HTTP_TAB_OR_SPACE), "x");
+  assertStrictEquals(CharSequence.trimStart("x ", HTTP_TAB_OR_SPACE), "x ");
+
+  const e1 = "`input` must be a `string`.";
+  assertThrows(
+    () => {
+      [...CharSequence.trimStart(
+        undefined as unknown as string,
+        HTTP_TAB_OR_SPACE,
+      )];
+    },
+    TypeError,
+    e1,
+  );
+
+  const e2 = "`pattern` must be a `string`.";
+  assertThrows(
+    () => {
+      [...CharSequence.trimStart("", undefined as unknown as string)];
+    },
+    TypeError,
+    e2,
+  );
+
+  assertStrictEquals(CharSequence.trimStart("", ""), "");
+  assertStrictEquals(CharSequence.trimStart("0", ""), "0");
+});
+
+Deno.test("CharSequence.trimEnd()", () => {
+  assertStrictEquals(CharSequence.trimEnd("", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(
+    CharSequence.trimEnd("\u0008", HTTP_TAB_OR_SPACE),
+    "\u0008",
+  );
+  assertStrictEquals(CharSequence.trimEnd("\t", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(
+    CharSequence.trimEnd("\u000A", HTTP_TAB_OR_SPACE),
+    "\u000A",
+  );
+  assertStrictEquals(
+    CharSequence.trimEnd("\u001F", HTTP_TAB_OR_SPACE),
+    "\u001F",
+  );
+  assertStrictEquals(CharSequence.trimEnd(" ", HTTP_TAB_OR_SPACE), "");
+  assertStrictEquals(
+    CharSequence.trimEnd("\u0021", HTTP_TAB_OR_SPACE),
+    "\u0021",
+  );
+  assertStrictEquals(CharSequence.trimEnd("a", HTTP_TAB_OR_SPACE), "a");
+  assertStrictEquals(
+    CharSequence.trimEnd("\t      \t    ", HTTP_TAB_OR_SPACE),
+    "",
+  );
+  assertStrictEquals(CharSequence.trimEnd("az", "[\\u{41}\\u{5A}]+"), "az");
+  assertStrictEquals(CharSequence.trimEnd("AZ", "[\\u{41}\\u{5A}]+"), "");
+  assertStrictEquals(CharSequence.trimEnd("azAZ", "[\\u{41}\\u{5A}]+"), "az");
+
+  assertStrictEquals(CharSequence.trimEnd("x x", HTTP_TAB_OR_SPACE), "x x");
+  assertStrictEquals(CharSequence.trimEnd(" x", HTTP_TAB_OR_SPACE), " x");
+  assertStrictEquals(CharSequence.trimEnd("x ", HTTP_TAB_OR_SPACE), "x");
+
+  const e1 = "`input` must be a `string`.";
+  assertThrows(
+    () => {
+      [...CharSequence.trimEnd(
+        undefined as unknown as string,
+        HTTP_TAB_OR_SPACE,
+      )];
+    },
+    TypeError,
+    e1,
+  );
+
+  const e2 = "`pattern` must be a `string`.";
+  assertThrows(
+    () => {
+      [...CharSequence.trimEnd("", undefined as unknown as string)];
+    },
+    TypeError,
+    e2,
+  );
+
+  assertStrictEquals(CharSequence.trimEnd("", ""), "");
+  assertStrictEquals(CharSequence.trimEnd("0", ""), "0");
+});
