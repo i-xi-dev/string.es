@@ -26,12 +26,14 @@ type grapheme = string;
  */
 export const EMPTY = "";
 
-export function* toChars(source: string): Generator<char, void, void> {
+export function toChars(source: string): IterableIterator<char, void, void> {
   StringType.assertString(source, "source");
 
-  for (let i = 0; i < source.length; i++) {
-    yield source.charAt(i);
-  }
+  return (function* (s) {
+    for (let i = 0; i < s.length; i++) {
+      yield source.charAt(i);
+    }
+  })(source);
 }
 
 export function charCountOf(source: string): int {
@@ -46,11 +48,14 @@ function _assertUsvString(test: unknown, label: string): void {
 }
 
 //XXX オプションでallowMalformed
-export function* toRunes(source: string): Generator<rune, void, void> {
+export function toRunes(source: string): IterableIterator<rune, void, void> {
   _assertUsvString(source, "source");
-  for (const rune of [...source]) {
-    yield rune;
-  }
+
+  return (function* (s) {
+    for (const rune of [...s]) {
+      yield rune;
+    }
+  })(source);
 }
 
 //XXX オプションでallowMalformed
@@ -69,10 +74,45 @@ export function* toCodePoints(
   }
 }
 
-// export function* toGraphemes(source: string): Generator<grapheme, void, void> {
-//   StringType.assertString(source, "source");
-//   //TODO
-// }
+let _lastSegmenter: WeakRef<Intl.Segmenter>;
+
+function _getGraphemeSegmenter(locale: string | Intl.Locale): Intl.Segmenter {
+  const localeName = (locale instanceof Intl.Locale) ? locale.baseName : locale;
+
+  const prev = _lastSegmenter?.deref();
+  if (prev && (prev.resolvedOptions().locale === localeName)) {
+    return prev;
+  }
+
+  const segmenter = new Intl.Segmenter(localeName, { granularity: "grapheme" });
+  const resolvedLocale = segmenter.resolvedOptions().locale;
+
+  if (localeName !== resolvedLocale) {
+    //XXX 上位の構成要素がマッチしてればokにする？
+    throw new RangeError("`locale` is an unsupported locale at runtime.");
+  } //XXX 再現条件未調査:Intlのパーサが"jp"をregion扱いしないバグがある？ので日本語関係はエラーになる確率が高い
+
+  _lastSegmenter = new WeakRef(segmenter);
+
+  return segmenter;
+}
+
+//XXX オプションでallowMalformed
+export function toGraphemes(
+  source: string,
+  locale: string | Intl.Locale = "en",
+): IterableIterator<grapheme, void, void> {
+  _assertUsvString(source, "source");
+
+  const segmenter = _getGraphemeSegmenter(locale);
+
+  return (function* (seg, s) {
+    const segements = seg.segment(s);
+    for (const segment of segements) {
+      yield segment.segment;
+    }
+  })(segmenter, source);
+}
 
 export function matches(input: string, pattern: string): boolean {
   StringType.assertString(input, "input");

@@ -43,9 +43,9 @@ export function isCodePoint(test: unknown): test is codepoint {
   return SafeIntegerType.isInRange(test, MIN_VALUE, MAX_VALUE);
 }
 
-export function assertCodePoint(codePoint: unknown): void {
-  if (isCodePoint(codePoint) !== true) {
-    throw new TypeError("`codePoint` must be a code point.");
+export function assertCodePoint(test: unknown, label: string): void {
+  if (isCodePoint(test) !== true) {
+    throw new TypeError(`\`${label}\` must be a code point.`);
   }
 }
 
@@ -54,8 +54,8 @@ function _isInRange(
   min: codepoint,
   max: codepoint,
 ): codePoint is codepoint {
-  assertCodePoint(min);
-  assertCodePoint(max);
+  assertCodePoint(min, "min");
+  assertCodePoint(max, "max");
 
   return isCodePoint(codePoint) && (min <= codePoint) && (max >= codePoint);
 }
@@ -89,12 +89,12 @@ const _toStringOptions = {
 } as const;
 
 export function toString(codePoint: codepoint): string {
-  assertCodePoint(codePoint);
+  assertCodePoint(codePoint, "codePoint");
   return `U+${SafeIntegerType.toString(codePoint, _toStringOptions)}`;
 }
 
 export function planeOf(codePoint: codepoint): plane {
-  assertCodePoint(codePoint);
+  assertCodePoint(codePoint, "codePoint");
   return Math.trunc(codePoint / 0x10000) as plane;
 }
 
