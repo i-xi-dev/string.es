@@ -1,4 +1,5 @@
-import { SafeIntegerType, StringType } from "../deps.ts";
+import { ObjectType, StringType } from "../deps.ts";
+import { CodePoint } from "../mod.ts";
 
 /** Integer. */
 type int = number;
@@ -65,14 +66,41 @@ export function runeCountOf(source: string): int {
 }
 
 //XXX オプションでallowMalformed
-export function* toCodePoints(
-  source: string,
-): Generator<codepoint, void, void> {
-  _assertUsvString(source, "source");
-  for (const rune of [...source]) {
-    yield rune.codePointAt(0)!;
+export function fromCodePoints(source: Iterable<codepoint>): string {
+  if (ObjectType.isIterable(source) !== true) {
+    throw new TypeError("TODO");
   }
+
+  let runes = EMPTY;
+  let rune: string;
+  for (const codePoint of source) {
+    CodePoint.assertCodePoint(codePoint, "codePoint");
+    rune = String.fromCodePoint(codePoint);
+    if (rune.isWellFormed() !== true) {
+      throw new RangeError("TODO");
+    }
+    runes += rune;
+  }
+  return runes;
 }
+
+//XXX fromCodePointsAsync(source: AsyncIterable<codepoint>): Promise<string>
+
+//XXX オプションでallowMalformed
+export function toCodePoints(
+  source: string,
+): IterableIterator<codepoint, void, void> {
+  _assertUsvString(source, "source");
+
+  return (function* (s) {
+    for (const rune of [...s]) {
+      yield rune.codePointAt(0)!;
+    }
+  })(source);
+}
+
+//XXX fromCharCodes(source: Iterable<uint16 | [uint16] | [uint16, uint16]>): string
+//XXX toCharCodes(source: string): IterableIterator<[uint16] | [uint16, uint16]>
 
 let _lastSegmenter: WeakRef<Intl.Segmenter>;
 
@@ -179,32 +207,40 @@ export function trimEnd(input: string, pattern: string): string {
   return input.replace(new RegExp(`${pattern}$`, "u"), EMPTY);
 }
 
-//
+// toCharsがあればいらんでしょう
+// export function* segmentedChars(
+//   input: string,
+//   charCount: int,
+//   paddingChar?: char,
+// ): Generator<string, void, void> {
+//   StringType.assertString(input, "input");
 
-export function* segmentedChars(
-  input: string,
-  charCount: int,
-  paddingChar?: char,
-): Generator<string, void, void> {
-  StringType.assertString(input, "input");
+//   if (SafeIntegerType.isPositive(charCount) !== true) {
+//     throw new TypeError("charCount");
+//   }
+//   if (
+//     (StringType.isString(paddingChar) !== true) && (paddingChar !== undefined)
+//   ) {
+//     throw new TypeError("paddingChar");
+//   }
+//   if (StringType.isString(paddingChar) && (paddingChar.length !== 1)) {
+//     throw new TypeError("paddingChar must be a code unit");
+//   }
 
-  if (SafeIntegerType.isPositive(charCount) !== true) {
-    throw new TypeError("charCount");
-  }
-  if (
-    (StringType.isString(paddingChar) !== true) && (paddingChar !== undefined)
-  ) {
-    throw new TypeError("paddingChar");
-  }
-  if (StringType.isString(paddingChar) && (paddingChar.length !== 1)) {
-    throw new TypeError("paddingChar must be a code unit");
-  }
+//   for (let i = 0; i < input.length; i = i + charCount) {
+//     const s = input.substring(i, i + charCount);
+//     yield ((s.length === charCount) ||
+//         (StringType.isString(paddingChar) !== true))
+//       ? s
+//       : s.padEnd(charCount, paddingChar);
+//   }
+// }
 
-  for (let i = 0; i < input.length; i = i + charCount) {
-    const s = input.substring(i, i + charCount);
-    yield ((s.length === charCount) ||
-        (StringType.isString(paddingChar) !== true))
-      ? s
-      : s.padEnd(charCount, paddingChar);
-  }
-}
+//TODO
+/*
+plane一致のrune（or grapheme）列抜き出し
+BMPのrune列抜き出し
+codepoint range一致のrune（or grapheme）列抜き出し
+script一致のrune（or grapheme）列抜き出し
+gc一致のrune（or grapheme）列抜き出し
+*/

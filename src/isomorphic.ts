@@ -28,7 +28,7 @@ export function decode(input: BufferSource = new Uint8Array(0)): string {
   const chars = Array.from(bytes, (byte) => {
     return String.fromCharCode(byte);
   });
-  return chars.join(EMPTY);
+  return chars.join(EMPTY); //XXX +=の方が多分速い
 }
 
 /**

@@ -597,3 +597,71 @@ Deno.test("CharSequence.trimEnd()", () => {
   assertStrictEquals(CharSequence.trimEnd("", ""), "");
   assertStrictEquals(CharSequence.trimEnd("0", ""), "0");
 });
+
+// Deno.test("segment(string, number)", () => {
+//   assertStrictEquals([...segment("", 2)].join(","), "");
+//   assertStrictEquals([...segment("abc", 2)].join(","), "ab,c");
+//   assertStrictEquals(
+//     [...segment("あいう", 2, "X")].join(","),
+//     "あい,うX",
+//   );
+//   assertStrictEquals(
+//     [...segment("あ\uD800\uDC00う", 2, "X")].join(","),
+//     "あ\uD800,\uDC00う",
+//   );
+//   assertStrictEquals(
+//     [...segment("あい\uD800\uDC00", 2, "X")].join(","),
+//     "あい,\uD800\uDC00",
+//   );
+//
+//   //
+//   assertStrictEquals(
+//     [...segment("🤷🏽‍♀️", 2, "X")].join(","),
+//     "\u{d83e}\u{dd37},\u{d83c}\u{dffd},\u{200d}\u{2640},\u{fe0f}X",
+//   );
+//
+//   assertThrows(
+//     () => {
+//       [...segment(1 as unknown as string, 0)];
+//     },
+//     TypeError,
+//     "input",
+//   );
+//
+//   assertThrows(
+//     () => {
+//       [...segment("", 0)];
+//     },
+//     TypeError,
+//     "charCount",
+//   );
+//
+//   assertStrictEquals(
+//     [...segment("\u{10000}\u{10001}\u{10002}", 2)].join(","),
+//     "\u{10000},\u{10001},\u{10002}",
+//   );
+// });
+
+// Deno.test("segment(string, number, string)", () => {
+//   assertStrictEquals([...segment("", 2, "X")].join(","), "");
+//   assertStrictEquals(
+//     [...segment("abc", 2, "X")].join(","),
+//     "ab,cX",
+//   );
+//
+//   assertThrows(
+//     () => {
+//       [...segment("", 1, "")];
+//     },
+//     TypeError,
+//     "paddingChar",
+//   );
+//
+//   assertThrows(
+//     () => {
+//       [...segment("", 1, "XX")];
+//     },
+//     TypeError,
+//     "paddingChar",
+//   );
+// });
