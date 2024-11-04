@@ -1,26 +1,6 @@
+import * as CodePoint from "./code_point.ts";
+import { char, codepoint, grapheme, int, rune } from "./_.ts";
 import { ObjectType, StringType } from "../deps.ts";
-import { CodePoint } from "../mod.ts";
-
-/** Integer. */
-type int = number;
-
-/** 0x0-0x10FFFF */
-type codepoint = number;
-
-/**
- * String matching regular expression `/^[\u0000-\uFFFF]{1}$/`.
- * including surrogates.
- */
-type char = string;
-
-/**
- * String matching regular expression `/^[\u{0}-\u{10FFFF}]{1}$/u`.
- * excluding any lone surrogates.
- */
-type rune = string;
-
-/** A grapheme cluster. */
-type grapheme = string;
 
 /**
  * The zero-length string.
@@ -70,7 +50,7 @@ export function fromCodePoints(source: Iterable<codepoint>): string {
   ObjectType.assertIterable(source, "source");
 
   let runes = EMPTY;
-  let rune: string;
+  let rune: rune;
   for (const codePoint of source) {
     CodePoint.assertCodePoint(codePoint, "codePoint");
     rune = String.fromCodePoint(codePoint);
@@ -233,12 +213,3 @@ export function trimEnd(input: string, pattern: string): string {
 //       : s.padEnd(charCount, paddingChar);
 //   }
 // }
-
-//TODO
-/*
-plane一致のrune（or grapheme）列抜き出し
-BMPのrune列抜き出し
-codepoint range一致のrune（or grapheme）列抜き出し
-script一致のrune（or grapheme）列抜き出し
-gc一致のrune（or grapheme）列抜き出し
-*/

@@ -1,6 +1,5 @@
+import { codepoint } from "./_.ts";
 import { IntegerRange } from "../deps.ts";
-
-type codepoint = number;
 
 // https://www.unicode.org/Public/UNIDATA/Blocks.txt
 export const Block: Record<string, IntegerRange.Tuple<codepoint>> = {

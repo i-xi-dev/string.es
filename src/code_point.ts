@@ -1,25 +1,5 @@
+import { codepoint, plane } from "./_.ts";
 import { IntegerRange, Numerics, SafeIntegerType } from "../deps.ts";
-
-type codepoint = number;
-
-type plane =
-  | 0
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 6
-  | 7
-  | 8
-  | 9
-  | 10
-  | 11
-  | 12
-  | 13
-  | 14
-  | 15
-  | 16;
 
 const _BMP: plane = 0;
 const _SPUA_B: plane = 16;
