@@ -329,6 +329,40 @@ Deno.test("CharSequence.toCodePoints()", () => {
   );
 });
 
+Deno.test("CharSequence.toCodePoints() - allowMalformed", () => {
+  const op = { allowMalformed: true } as const;
+
+  assertStrictEquals(_iToS(CharSequence.toCodePoints("", op)), `[]`);
+  assertStrictEquals(_iToS(CharSequence.toCodePoints("012", op)), `[48,49,50]`);
+  assertStrictEquals(
+    _iToS(CharSequence.toCodePoints("あい", op)),
+    `[12354,12356]`,
+  );
+  assertStrictEquals(
+    _iToS(CharSequence.toCodePoints("\u{2000B}", op)),
+    `[131083]`,
+  );
+
+  assertStrictEquals(
+    _iToS(CharSequence.toCodePoints("012\u{2000B}あい", op)),
+    `[48,49,50,131083,12354,12356]`,
+  );
+
+  const e1 = "`source` must be a `string`.";
+  assertThrows(
+    () => {
+      CharSequence.toCodePoints(undefined as unknown as string, op);
+    },
+    TypeError,
+    e1,
+  );
+
+  assertStrictEquals(
+    _iToS(CharSequence.toCodePoints("\u{dc0b}\u{d840}", op)),
+    `[56331,55360]`,
+  );
+});
+
 Deno.test("CharSequence.toGraphemes()", () => {
   assertStrictEquals(_iToS(CharSequence.toGraphemes("")), `[]`);
   assertStrictEquals(_iToS(CharSequence.toGraphemes("012")), `["0","1","2"]`);

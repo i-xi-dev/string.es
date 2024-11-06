@@ -85,11 +85,15 @@ export function fromCodePoints(
 
 //XXX fromCodePointsAsync(source: AsyncIterable<codepoint>, options?: AllowMalformedOptions): Promise<string>
 
-//XXX オプションでallowMalformed
 export function toCodePoints(
   source: string,
+  options?: AllowMalformedOptions,
 ): IterableIterator<codepoint, void, void> {
-  _assertUsvString(source, "source");
+  if (options?.allowMalformed === true) {
+    StringType.assertString(source, "source");
+  } else {
+    _assertUsvString(source, "source");
+  }
 
   return (function* (s) {
     for (const rune of [...s]) {
