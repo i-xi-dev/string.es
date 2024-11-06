@@ -388,17 +388,29 @@ Deno.test("CharSequence.toGraphemes()", () => {
     e1,
   );
 
-  assertStrictEquals(_iToS(CharSequence.toGraphemes("0", "en")), `["0"]`);
-  assertStrictEquals(_iToS(CharSequence.toGraphemes("0", "en-US")), `["0"]`);
-  // assertStrictEquals(_iToS(CharSequence.toGraphemes("0", "en-Latn-US")), `["0"]`,);
-
-  assertStrictEquals(_iToS(CharSequence.toGraphemes("0", "ja")), `["0"]`);
-  // assertStrictEquals(_iToS(CharSequence.toGraphemes("0", "ja-Jpan")), `["0"]`);
-  assertStrictEquals(_iToS(CharSequence.toGraphemes("0", "ja-JP")), `["0"]`);
-  // assertStrictEquals(_iToS(CharSequence.toGraphemes("0", "ja-Jpan-JP")), `["0"]`);
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("0", { locale: "en" })),
+    `["0"]`,
+  );
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("0", { locale: "en-US" })),
+    `["0"]`,
+  );
+  // assertStrictEquals(_iToS(CharSequence.toGraphemes("0", {locale:"en-Latn-US"})), `["0"]`,);
 
   assertStrictEquals(
-    _iToS(CharSequence.toGraphemes("g̈", "en")),
+    _iToS(CharSequence.toGraphemes("0", { locale: "ja" })),
+    `["0"]`,
+  );
+  // assertStrictEquals(_iToS(CharSequence.toGraphemes("0", {locale:"ja-Jpan"})), `["0"]`);
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("0", { locale: "ja-JP" })),
+    `["0"]`,
+  );
+  // assertStrictEquals(_iToS(CharSequence.toGraphemes("0", {locale:"ja-Jpan-JP"})), `["0"]`);
+
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("g̈", { locale: "en" })),
     `["\u0067\u0308"]`,
   );
   assertStrictEquals(_iToS(CharSequence.toGraphemes("각")), `["\uAC01"]`);
@@ -422,7 +434,7 @@ Deno.test("CharSequence.toGraphemes()", () => {
   assertStrictEquals(_iToS(CharSequence.toGraphemes("ि")), `["\u093F"]`);
 
   // assertStrictEquals(_iToS(CharSequence.toGraphemes("ch")), `["\u0063","\u0068"]`);
-  // assertStrictEquals(_iToS(CharSequence.toGraphemes("ch", "sk")), `["\u0063\u0068"]`);
+  // assertStrictEquals(_iToS(CharSequence.toGraphemes("ch", {locale:"sk"})), `["\u0063\u0068"]`);
   // assertStrictEquals(_iToS(CharSequence.toGraphemes("kʷ")), `["\u006B","\u02B7"]`);
 
   assertStrictEquals(_iToS(CharSequence.toGraphemes("Ą́")), `["\u0104\u0301"]`);
@@ -433,6 +445,114 @@ Deno.test("CharSequence.toGraphemes()", () => {
   );
   assertStrictEquals(
     _iToS(CharSequence.toGraphemes("𩸽が塚󠄁".normalize("NFC"))),
+    `["\u{29E3D}","\u304C","\u585A\u{E0101}"]`,
+  );
+});
+
+Deno.test("CharSequence.toGraphemes() - allowMalformed", () => {
+  const op = { allowMalformed: true } as const;
+
+  assertStrictEquals(_iToS(CharSequence.toGraphemes("", op)), `[]`);
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("012", op)),
+    `["0","1","2"]`,
+  );
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("あい", op)),
+    `["あ","い"]`,
+  );
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("\u{2000B}", op)),
+    `["\u{2000B}"]`,
+  );
+
+  const e1 = "`source` must be a `string`.";
+  assertThrows(
+    () => {
+      CharSequence.toGraphemes(undefined as unknown as string, op);
+    },
+    TypeError,
+    e1,
+  );
+
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("\u{dc0b}\u{d840}", op)),
+    `["\\udc0b","\\ud840"]`,
+  );
+
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("0", Object.assign({ locale: "en" }, op))),
+    `["0"]`,
+  );
+  assertStrictEquals(
+    _iToS(
+      CharSequence.toGraphemes("0", Object.assign({ locale: "en-US" }, op)),
+    ),
+    `["0"]`,
+  );
+  // assertStrictEquals(_iToS(CharSequence.toGraphemes("0", Object.assign({locale:"en-Latn-US"}, op))), `["0"]`,);
+
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("0", Object.assign({ locale: "ja" }, op))),
+    `["0"]`,
+  );
+  // assertStrictEquals(_iToS(CharSequence.toGraphemes("0", Object.assign({locale:"ja-Jpan"}, op))), `["0"]`);
+  assertStrictEquals(
+    _iToS(
+      CharSequence.toGraphemes("0", Object.assign({ locale: "ja-JP" }, op)),
+    ),
+    `["0"]`,
+  );
+  // assertStrictEquals(_iToS(CharSequence.toGraphemes("0", Object.assign({locale:"ja-Jpan-JP"}, op))), `["0"]`);
+
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("g̈", Object.assign({ locale: "en" }, op))),
+    `["\u0067\u0308"]`,
+  );
+  assertStrictEquals(_iToS(CharSequence.toGraphemes("각", op)), `["\uAC01"]`);
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("각", op)),
+    `["\u1100\u1161\u11A8"]`,
+  );
+  assertStrictEquals(_iToS(CharSequence.toGraphemes("ก", op)), `["\u0E01"]`);
+
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("நி", op)),
+    `["\u0BA8\u0BBF"]`,
+  );
+  assertStrictEquals(_iToS(CharSequence.toGraphemes("เ", op)), `["\u0E40"]`);
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("กำ", op)),
+    `["\u0E01\u0E33"]`,
+  );
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("षि", op)),
+    `["\u0937\u093F"]`,
+  );
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("क्षि", op)),
+    `["\u0915\u094D\u0937\u093F"]`,
+  );
+
+  assertStrictEquals(_iToS(CharSequence.toGraphemes("ำ", op)), `["\u0E33"]`);
+  assertStrictEquals(_iToS(CharSequence.toGraphemes("ष", op)), `["\u0937"]`);
+  assertStrictEquals(_iToS(CharSequence.toGraphemes("ि", op)), `["\u093F"]`);
+
+  // assertStrictEquals(_iToS(CharSequence.toGraphemes("ch", op)), `["\u0063","\u0068"]`);
+  // assertStrictEquals(_iToS(CharSequence.toGraphemes("ch", Object.assign({locale:"sk"}, op))), `["\u0063\u0068"]`);
+  // assertStrictEquals(_iToS(CharSequence.toGraphemes("kʷ", op)), `["\u006B","\u02B7"]`);
+
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("Ą́", op)),
+    `["\u0104\u0301"]`,
+  );
+
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("𩸽が塚󠄁", op)),
+    `["\u{29E3D}","\u304b\u3099","\u585A\u{E0101}"]`,
+  );
+  assertStrictEquals(
+    _iToS(CharSequence.toGraphemes("𩸽が塚󠄁".normalize("NFC"), op)),
     `["\u{29E3D}","\u304C","\u585A\u{E0101}"]`,
   );
 });

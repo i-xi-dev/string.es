@@ -128,15 +128,32 @@ function _getGraphemeSegmenter(locale: string | Intl.Locale): Intl.Segmenter {
   return segmenter;
 }
 
+export type ToGraphemesOptions = /* AllowMalformedOptions & */ {
+  allowMalformed?: boolean;
+  locale?: string | Intl.Locale;
+};
+
+function _resolveLocale(locale?: string | Intl.Locale): string | Intl.Locale {
+  if (StringType.isNonEmpty(locale)) {
+    return locale;
+  } else if (locale instanceof Intl.Locale) {
+    return locale;
+  }
+  return "en";
+}
+
 // 分割はIntl.Segmenterに依存する（実行環境によって結果が異なる可能性は排除できない）
-//XXX オプションでallowMalformed
 export function toGraphemes(
   source: string,
-  locale: string | Intl.Locale = "en",
+  options?: ToGraphemesOptions,
 ): IterableIterator<grapheme, void, void> {
-  _assertUsvString(source, "source");
+  if (options?.allowMalformed === true) {
+    StringType.assertString(source, "source");
+  } else {
+    _assertUsvString(source, "source");
+  }
 
-  const segmenter = _getGraphemeSegmenter(locale);
+  const segmenter = _getGraphemeSegmenter(_resolveLocale(options?.locale));
 
   return (function* (seg, s) {
     const segements = seg.segment(s);
