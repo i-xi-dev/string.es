@@ -104,6 +104,84 @@ Deno.test("CharSequence.toRunes()", () => {
   );
 });
 
+Deno.test("CharSequence.toRunes() - allowMalformed", () => {
+  const op = { allowMalformed: true } as const;
+
+  assertStrictEquals(_iToS(CharSequence.toRunes("", op)), `[]`);
+  assertStrictEquals(_iToS(CharSequence.toRunes("012", op)), `["0","1","2"]`);
+  assertStrictEquals(_iToS(CharSequence.toRunes("あい", op)), `["あ","い"]`);
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("\u{2000B}", op)),
+    `["\u{2000B}"]`,
+  ); // JSONの仕様ではサロゲートペアをエスケープするだったような
+
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("g̈", op)),
+    `["\u0067","\u0308"]`,
+  );
+  assertStrictEquals(_iToS(CharSequence.toRunes("각", op)), `["\uAC01"]`);
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("각", op)),
+    `["\u1100","\u1161","\u11A8"]`,
+  );
+  assertStrictEquals(_iToS(CharSequence.toRunes("ก", op)), `["\u0E01"]`);
+
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("நி", op)),
+    `["\u0BA8","\u0BBF"]`,
+  );
+  assertStrictEquals(_iToS(CharSequence.toRunes("เ", op)), `["\u0E40"]`);
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("กำ", op)),
+    `["\u0E01","\u0E33"]`,
+  );
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("षि", op)),
+    `["\u0937","\u093F"]`,
+  );
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("क्षि", op)),
+    `["\u0915","\u094D","\u0937","\u093F"]`,
+  );
+
+  assertStrictEquals(_iToS(CharSequence.toRunes("ำ", op)), `["\u0E33"]`);
+  assertStrictEquals(_iToS(CharSequence.toRunes("ष", op)), `["\u0937"]`);
+  assertStrictEquals(_iToS(CharSequence.toRunes("ि", op)), `["\u093F"]`);
+
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("ch", op)),
+    `["\u0063","\u0068"]`,
+  );
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("kʷ", op)),
+    `["\u006B","\u02B7"]`,
+  );
+
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("Ą́", op)),
+    `["\u0104","\u0301"]`,
+  );
+
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("𩸽が塚󠄁", op)),
+    `["\u{29E3D}","\u304b","\u3099","\u585A","\u{E0101}"]`,
+  );
+
+  const e1 = "`source` must be a `string`.";
+  assertThrows(
+    () => {
+      [...CharSequence.toRunes(undefined as unknown as string, op)];
+    },
+    TypeError,
+    e1,
+  );
+
+  assertStrictEquals(
+    _iToS(CharSequence.toRunes("\u{dc0b}\u{d840}", op)),
+    `["\\udc0b","\\ud840"]`,
+  );
+});
+
 Deno.test("CharSequence.runeCountOf()", () => {
   assertStrictEquals(CharSequence.runeCountOf(""), 0);
   assertStrictEquals(CharSequence.runeCountOf("012"), 3);
@@ -154,6 +232,15 @@ Deno.test("CharSequence.fromCodePoints()", () => {
     },
     TypeError,
     e2,
+  );
+
+  const e3 = "`source` must not contain lone surrogate code points.";
+  assertThrows(
+    () => {
+      [...CharSequence.fromCodePoints([48, 0xDC00, 0xD800])];
+    },
+    RangeError,
+    e3,
   );
 });
 

@@ -28,9 +28,19 @@ function _assertUsvString(test: unknown, label: string): void {
   }
 }
 
-//XXX オプションでallowMalformed
-export function toRunes(source: string): IterableIterator<rune, void, void> {
-  _assertUsvString(source, "source");
+export type AllowMalformedOptions = {
+  allowMalformed?: boolean;
+};
+
+export function toRunes(
+  source: string,
+  options?: AllowMalformedOptions,
+): IterableIterator<rune, void, void> {
+  if (options?.allowMalformed === true) {
+    StringType.assertString(source, "source");
+  } else {
+    _assertUsvString(source, "source");
+  }
 
   return (function* (s) {
     for (const rune of [...s]) {
@@ -55,7 +65,9 @@ export function fromCodePoints(source: Iterable<codepoint>): string {
     CodePoint.assertCodePoint(codePoint, "codePoint");
     rune = String.fromCodePoint(codePoint);
     if (rune.isWellFormed() !== true) {
-      throw new RangeError("TODO");
+      throw new RangeError(
+        "`source` must not contain lone surrogate code points.",
+      );
     }
     runes += rune;
   }
