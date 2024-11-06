@@ -62,8 +62,10 @@ export function runeCountOf(
   return [...source].length;
 }
 
-//XXX オプションでallowMalformed
-export function fromCodePoints(source: Iterable<codepoint>): string {
+export function fromCodePoints(
+  source: Iterable<codepoint>,
+  options?: AllowMalformedOptions,
+): string {
   ObjectType.assertIterable(source, "source");
 
   let runes = EMPTY;
@@ -71,7 +73,7 @@ export function fromCodePoints(source: Iterable<codepoint>): string {
   for (const codePoint of source) {
     CodePoint.assertCodePoint(codePoint, "codePoint");
     rune = String.fromCodePoint(codePoint);
-    if (rune.isWellFormed() !== true) {
+    if ((options?.allowMalformed !== true) && (rune.isWellFormed() !== true)) {
       throw new RangeError(
         "`source` must not contain lone surrogate code points.",
       );
@@ -81,7 +83,7 @@ export function fromCodePoints(source: Iterable<codepoint>): string {
   return runes;
 }
 
-//XXX fromCodePointsAsync(source: AsyncIterable<codepoint>): Promise<string>
+//XXX fromCodePointsAsync(source: AsyncIterable<codepoint>, options?: AllowMalformedOptions): Promise<string>
 
 //XXX オプションでallowMalformed
 export function toCodePoints(

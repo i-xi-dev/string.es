@@ -264,6 +264,43 @@ Deno.test("CharSequence.fromCodePoints()", () => {
   );
 });
 
+Deno.test("CharSequence.fromCodePoints() - allowMalformed", () => {
+  const op = { allowMalformed: true } as const;
+
+  assertStrictEquals(CharSequence.fromCodePoints([], op), "");
+  assertStrictEquals(CharSequence.fromCodePoints([48, 49, 50], op), "012");
+  assertStrictEquals(CharSequence.fromCodePoints([12354, 12356], op), "あい");
+  assertStrictEquals(CharSequence.fromCodePoints([131083], op), "\u{2000B}");
+
+  assertStrictEquals(
+    CharSequence.fromCodePoints([48, 49, 50, 131083, 12354, 12356], op),
+    "012\u{2000B}あい",
+  );
+
+  const e1 = "`source` must implement `Symbol.iterator`.";
+  assertThrows(
+    () => {
+      CharSequence.fromCodePoints(1 as unknown as number[], op);
+    },
+    TypeError,
+    e1,
+  );
+
+  const e2 = "`codePoint` must be a code point.";
+  assertThrows(
+    () => {
+      CharSequence.fromCodePoints([48, -1], op);
+    },
+    TypeError,
+    e2,
+  );
+
+  assertStrictEquals(
+    CharSequence.fromCodePoints([48, 0xDC00, 0xD800], op),
+    "0\uDC00\uD800",
+  );
+});
+
 Deno.test("CharSequence.toCodePoints()", () => {
   assertStrictEquals(_iToS(CharSequence.toCodePoints("")), `[]`);
   assertStrictEquals(_iToS(CharSequence.toCodePoints("012")), `[48,49,50]`);
