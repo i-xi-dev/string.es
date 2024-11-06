@@ -170,7 +170,7 @@ Deno.test("CharSequence.toRunes() - allowMalformed", () => {
   const e1 = "`source` must be a `string`.";
   assertThrows(
     () => {
-      [...CharSequence.toRunes(undefined as unknown as string, op)];
+      CharSequence.toRunes(undefined as unknown as string, op);
     },
     TypeError,
     e1,
@@ -203,6 +203,26 @@ Deno.test("CharSequence.runeCountOf()", () => {
     TypeError,
     e1,
   );
+});
+
+Deno.test("CharSequence.runeCountOf() - allowMalformed", () => {
+  const op = { allowMalformed: true } as const;
+
+  assertStrictEquals(CharSequence.runeCountOf("", op), 0);
+  assertStrictEquals(CharSequence.runeCountOf("012", op), 3);
+  assertStrictEquals(CharSequence.runeCountOf("あい", op), 2);
+  assertStrictEquals(CharSequence.runeCountOf("\u{2000B}", op), 1);
+
+  const e1 = "`source` must be a `string`.";
+  assertThrows(
+    () => {
+      CharSequence.runeCountOf(undefined as unknown as string, op);
+    },
+    TypeError,
+    e1,
+  );
+
+  assertStrictEquals(CharSequence.runeCountOf("\u{dc0b}\u{d840}", op), 2);
 });
 
 Deno.test("CharSequence.fromCodePoints()", () => {

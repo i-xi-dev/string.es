@@ -49,9 +49,16 @@ export function toRunes(
   })(source);
 }
 
-//XXX オプションでallowMalformed
-export function runeCountOf(source: string): int {
-  _assertUsvString(source, "source");
+export function runeCountOf(
+  source: string,
+  options?: AllowMalformedOptions,
+): int {
+  if (options?.allowMalformed === true) {
+    StringType.assertString(source, "source");
+  } else {
+    _assertUsvString(source, "source");
+  }
+
   return [...source].length;
 }
 
